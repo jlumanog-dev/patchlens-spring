@@ -59,19 +59,19 @@ public class UserRestController {
 
     @PostMapping("/login")
     public ResponseEntity<Map<String, Object>> login(@RequestBody User payloadUser){
-        Map<String, Object> res = new HashMap<>();
+        Map<String, Object> response = new HashMap<>();
         UserDetails user;
         String token;
         try{
             Authentication authObject = this.authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(payloadUser.getUsername(), payloadUser.getPassword()));
             user = (UserDetails) authObject.getPrincipal();
             token = this.jwtService.generateToken(user);
-            res.put("MESSAGE", "NO ERROR IN AUTHENTICATION, VALID LOGIN");
+            response.put("MESSAGE", "NO ERROR IN AUTHENTICATION, VALID LOGIN");
         }catch (Exception e){
             throw new AuthenticationErrorException("Invalid credentials - occurred in /login");
         }
-        res.put("token", token);
-        return ResponseEntity.ok(res);
+        response.put("token", token);
+        return ResponseEntity.ok(response);
 
 
        /* System.out.println(payloadUser);
