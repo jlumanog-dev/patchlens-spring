@@ -41,16 +41,10 @@ public class UserRestController {
 
     @PostMapping("/register")
     public Map<String, Object> register(@RequestBody User payloadUser){
-        System.out.println(payloadUser);
-        System.out.println(payloadUser.getPassword());
         Object encodePassword = this.passwordEncoder.encode(payloadUser.getPassword());
-        System.out.println(encodePassword);
         String finalEncodedValue = "{bcrypt}" + encodePassword;
-        System.out.println("Final: " + finalEncodedValue);
         payloadUser.setPassword(finalEncodedValue);
-
-        //this.userService.save(payloadUser);
-
+        this.userService.save(payloadUser);
 
         Map<String, Object> response = new HashMap<>();
         response.put("STATUS: ", HttpStatus.OK);
@@ -63,6 +57,11 @@ public class UserRestController {
         UserDetails user;
         String token;
         try{
+            /*
+            passing an Authentication object type to authenticate()
+            The AuthenticationManager will then use an AuthenticationProvider, DelegatePasswordEncoder and
+            your CustomUserDetailsService to authenticate behind the scenes
+            */
             Authentication authObject = this.authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(payloadUser.getUsername(), payloadUser.getPassword()));
             user = (UserDetails) authObject.getPrincipal();
             token = this.jwtService.generateToken(user);
@@ -70,29 +69,7 @@ public class UserRestController {
         }catch (Exception e){
             throw new AuthenticationErrorException("Invalid credentials - occurred in /login");
         }
-        response.put("token", token);
+        response.put("TOKEN", token);
         return ResponseEntity.ok(response);
-
-
-       /* System.out.println(payloadUser);
-        User user;
-        try{
-            user = this.userService.findByUsername(payloadUser.getUsername());
-        }catch(Exception e){
-            throw new AuthenticationErrorException("Invalid login credentials! Try Again.");
-        }
-
-        //String bcryptValue = "{bcrypt}" + passwordEncoder.encode(payloadUser.getPassword());
-        System.out.println("input: " + payloadUser.getPassword());
-        System.out.println("in db: " + user.getPassword());
-
-        if(this.delegatingPasswordEncoder.matches(payloadUser.getPassword(), user.getPassword())){
-            res.put("Status: ", HttpStatus.OK);
-        }else{
-            throw new AuthenticationErrorException("Invalid login credentials! Try Again 2");
-        }
-*/
-
-
     }
 }

@@ -43,7 +43,7 @@ public class WebSecurityConfig {
 
         ).sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)).addFilterBefore(this.jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
-        httpSecurity.cors(Customizer.withDefaults());
+        httpSecurity.cors(Customizer.withDefaults()); // enable CORS
         httpSecurity.csrf(AbstractHttpConfigurer::disable);
         return httpSecurity.build();
     }
@@ -54,6 +54,8 @@ public class WebSecurityConfig {
     }
 
     //Define an AuthenticationManager to inject into your rest controller to use authenticate method.
+    //Also specify the type of AuthenticationProvider, and injecting UserDetailsService &
+    // DelegatingPasswordEncoder spring beans used to for authentication.
     @Bean
     public AuthenticationManager authenticationManager(UserDetailsService userDetailsService, DelegatingPasswordEncoder delegatingPasswordEncoder){
         DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider(userDetailsService);
@@ -63,7 +65,7 @@ public class WebSecurityConfig {
 
 /*   use DelegatingPasswordEncoder to authenticate password with {bcrypt} prefix
     because BcryptPasswordEncoder.matches() will not detect the prefix and
-    wont match the raw string password with hashed one*/
+    won't match the raw string password with hashed one*/
     @Bean
     public DelegatingPasswordEncoder delegatePasswordEncoder(){
         Map<String, PasswordEncoder> encoder = new HashMap<>();

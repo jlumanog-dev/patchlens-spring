@@ -15,6 +15,9 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+
+//This class is part of the Security Filter Chain that intercepts request
+//To check if it has a valid JWT to access specific resources/endpoints.
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
