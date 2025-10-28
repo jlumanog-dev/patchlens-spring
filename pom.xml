@@ -12,7 +12,8 @@
 	<artifactId>patchlens-spring-backend</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>patchlens-spring-backend</name>
-	<description>This is my Spring Boot backend application for project PatchLens, a web app that fetches and summarizes the latest game patch data from Dota 2 and view detailed patch insights powered by OpenAI API</description>
+	<description>This is my Spring Boot backend application for project PatchLens, a web app that fetches and summarizes the latest game patch data from Dota 2 and view detailed patch insights powered by OpenAI API
+	</description>
 	<url/>
 	<licenses>
 		<license/>
