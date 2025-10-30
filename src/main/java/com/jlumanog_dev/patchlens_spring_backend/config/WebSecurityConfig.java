@@ -20,6 +20,7 @@ import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -39,7 +40,9 @@ public class WebSecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception{
         httpSecurity.authorizeHttpRequests(configurer ->
                 configurer.requestMatchers(HttpMethod.POST, "/api/register", "/api/login").permitAll()
+                        .requestMatchers("/api/opendota/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/user").hasRole("USER").anyRequest().authenticated()
+                         // might change later to only accept authenticated request with ADMIN role
 
         ).sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)).addFilterBefore(this.jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
@@ -72,5 +75,10 @@ public class WebSecurityConfig {
         encoder.put("noop", NoOpPasswordEncoder.getInstance());
         encoder.put("bcrypt", this.passwordEncoder());
         return new DelegatingPasswordEncoder("bcrypt", encoder);
+    }
+
+    @Bean
+    public RestTemplate restTemplate(){
+        return new RestTemplate();
     }
 }
