@@ -6,11 +6,11 @@ import com.jlumanog_dev.patchlens_spring_backend.services.JwtService;
 import com.jlumanog_dev.patchlens_spring_backend.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
@@ -65,11 +65,25 @@ public class UserRestController {
             Authentication authObject = this.authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(payloadUser.getUsername(), payloadUser.getPassword()));
             user = (UserDetails) authObject.getPrincipal();
             token = this.jwtService.generateToken(user);
+            System.out.println(token);
             response.put("MESSAGE", "NO ERROR IN AUTHENTICATION, VALID LOGIN");
         }catch (Exception e){
             throw new AuthenticationErrorException("Invalid credentials - occurred in /login");
         }
         response.put("TOKEN", token);
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/user")
+    public ResponseEntity<Map<String, Object>> getUserData(){
+        Authentication authUser = SecurityContextHolder.getContext().getAuthentication(); // retrieve the authenticated user from the SecurityContextHolder.
+        UserDetails userDetails = (UserDetails) authUser.getPrincipal(); //map data from authentication object to user details to access username value later
+
+        Map<String, Object> res = new HashMap<>();
+        System.out.println("inside /user GET");
+        User user = this.userService.findByUsername(userDetails.getUsername());
+
+        res.put("username", user.getUsername());
+        return ResponseEntity.ok(res);
     }
 }
