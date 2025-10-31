@@ -10,6 +10,10 @@ public class HeroDaoImplementation implements HeroDao {
     public HeroDaoImplementation(EntityManager entityManager){
         this.entityManager = entityManager;
     }
+
+    /* Might modify this later for when a new hero is introduced.
+    Persist, Merge, or finding a way to append only the specific JSON element
+    that doesn't exist on the table yet*/
     public void saveAll(Hero[] allHeroes){
         for(Object elem : allHeroes){
             this.entityManager.merge(elem);
