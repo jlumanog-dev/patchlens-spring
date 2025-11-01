@@ -1,12 +1,9 @@
-package com.jlumanog_dev.patchlens_spring_backend.dao;
+package com.jlumanog_dev.patchlens_spring_backend.services;
 
 import com.jlumanog_dev.patchlens_spring_backend.entity.Hero;
 
 import java.util.List;
 
-public interface HeroDao {
-    public void saveAll(Hero[] allHeroes);
+public interface HeroService {
     public List<Hero> retrieveTopHeroesStats();
 }
-
-

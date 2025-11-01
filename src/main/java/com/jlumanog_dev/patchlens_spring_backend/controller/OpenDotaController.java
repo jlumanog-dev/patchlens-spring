@@ -1,6 +1,5 @@
 package com.jlumanog_dev.patchlens_spring_backend.controller;
 
-import com.jlumanog_dev.patchlens_spring_backend.dao.HeroDao;
 import com.jlumanog_dev.patchlens_spring_backend.services.OpenDotaRestService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,11 +10,11 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/opendota")
-public class HeroController {
+public class OpenDotaController {
 
     private OpenDotaRestService openDotaRestService;
 
-    public HeroController(OpenDotaRestService openDotaRestService){
+    public OpenDotaController(OpenDotaRestService openDotaRestService){
         this.openDotaRestService = openDotaRestService;
     }
 

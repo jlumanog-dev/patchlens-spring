@@ -40,7 +40,8 @@ public class WebSecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception{
         httpSecurity.authorizeHttpRequests(configurer ->
                 configurer.requestMatchers(HttpMethod.POST, "/api/register", "/api/login").permitAll()
-                        .requestMatchers("/api/opendota/**").permitAll()
+                        //Change this later to require incoming request for /api/heroes to be authenticated
+                        .requestMatchers("/api/opendota/**", "/api/heroes/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/user").hasRole("USER").anyRequest().authenticated()
                          // might change later to only accept authenticated request with ADMIN role
 

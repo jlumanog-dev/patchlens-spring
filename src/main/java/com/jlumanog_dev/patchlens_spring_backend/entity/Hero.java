@@ -14,6 +14,13 @@ so that in OpenDotaRestService, it can deserialize each JSON data to Hero Entity
 public class Hero {
     public Hero(){}
 
+    @OneToOne(cascade = {CascadeType.DETACH,
+            CascadeType.MERGE,
+            CascadeType.PERSIST,
+            CascadeType.REFRESH}, fetch = FetchType.LAZY)
+    @JoinColumn(name = "hero_stats_id")
+    public HeroStats heroStats;
+
     @Id
     @Column(name="id")
     private int id;
@@ -64,8 +71,16 @@ public class Hero {
         return roles;
     }
 
+    public HeroStats getHeroStats() {
+        return heroStats;
+    }
+
+    public void setHeroStats(HeroStats heroStats) {
+        this.heroStats = heroStats;
+    }
+
     @Override
     public String toString() {
-        return "ID: " + this.getId() + "\nName: " + this.getName() + "\nRoles: " + this.getRoles();
+        return "ID: " + this.getId() + "\nName: " + this.getName() + "\nRoles: " + this.getRoles() + "\nStats on Pub Win: " + this.getHeroStats();
     }
 }
