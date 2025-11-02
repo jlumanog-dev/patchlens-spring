@@ -41,8 +41,9 @@ public class WebSecurityConfig {
         httpSecurity.authorizeHttpRequests(configurer ->
                 configurer.requestMatchers(HttpMethod.POST, "/api/register", "/api/login").permitAll()
                         //Change this later to require incoming request for /api/heroes to be authenticated
-                        .requestMatchers("/api/opendota/**", "/api/heroes/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/user").hasRole("USER").anyRequest().authenticated()
+                        .requestMatchers("/api/opendota/**").permitAll()
+                        .requestMatchers("/api/user").hasRole("USER")
+                        .requestMatchers("/api/heroes/**").hasRole("USER").anyRequest().authenticated()
                          // might change later to only accept authenticated request with ADMIN role
 
         ).sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)).addFilterBefore(this.jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

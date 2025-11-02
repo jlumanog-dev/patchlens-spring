@@ -40,7 +40,7 @@ public class OpenDotaRestService {
             assert Objects.requireNonNull(heroes).length == Objects.requireNonNull(heroStats).length;
 
             //each hero is associated with their respective heroStats
-            for(int i = 0; i < heroes.length; i++) {
+            for(int i = 0; i < heroes.  length; i++) {
                 /* making sure that the current hero element is associated with the current hero stats element/object
                 by checking their localized_name values*/
                 System.out.println("from heroes: " + heroes[i].getLocalized_name());
