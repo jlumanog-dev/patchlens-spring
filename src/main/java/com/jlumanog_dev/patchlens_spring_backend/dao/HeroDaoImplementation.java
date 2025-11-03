@@ -19,7 +19,7 @@ public class HeroDaoImplementation implements HeroDao {
     that doesn't exist on the table yet*/
     public void saveAll(Hero[] allHeroes){
         for(Object elem : allHeroes){
-            this.entityManager.persist(elem);
+            this.entityManager.merge(elem);
         }
     }
 

@@ -1,5 +1,6 @@
 package com.jlumanog_dev.patchlens_spring_backend.config;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -82,5 +83,11 @@ public class WebSecurityConfig {
     @Bean
     public RestTemplate restTemplate(){
         return new RestTemplate();
+    }
+
+    //external dependency used for mapping entity instances to DTOs
+    @Bean
+    public ModelMapper modelMapper(){
+        return new ModelMapper();
     }
 }
