@@ -1,5 +1,6 @@
 package com.jlumanog_dev.patchlens_spring_backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 
 
@@ -79,8 +80,8 @@ public class Hero {
         this.heroStats = heroStats;
     }
 
-    @Override
+/*    @Override
     public String toString() {
-        return "ID: " + this.getId() + "\nName: " + this.getName() + "\nRoles: " + this.getRoles() + "\nStats on Pub Win: " + this.getHeroStats();
-    }
+        return "ID: " + this.getId() + "\nName: " + this.getName() + "\nRoles: " + this.getRoles();
+    }*/
 }

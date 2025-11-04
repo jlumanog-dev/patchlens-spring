@@ -16,8 +16,13 @@ public class HeroServiceImplementation implements HeroService{
     public HeroServiceImplementation(HeroDao heroDao){
         this.heroDao = heroDao;
     }
+    @Override
     public List<Hero> retrieveTopHeroesStats(){
         return this.heroDao.retrieveTopHeroesStats();
+    }
+    @Override
+    public List<Hero> retrieveAllHeroes(){
+        return this.heroDao.retrieveAllHeroes();
     }
 
 }

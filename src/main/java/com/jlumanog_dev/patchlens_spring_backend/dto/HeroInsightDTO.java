@@ -22,17 +22,26 @@ public class HeroInsightDTO {
     private String localized_name;
     private String[] roles;
     private String attack_type;
+    private String primary_attr;
     private HeroStats heroStats;
 
     private float winRate;
-    private float pickRateChange;
+    private float pickGrowthRateChange;
 
-    public float getPickRateChange() {
-        return pickRateChange;
+    public float getPickGrowthRateChange() {
+        return pickGrowthRateChange;
     }
 
-    public void setPickRateChange(float pickRateChange) {
-        this.pickRateChange = pickRateChange;
+    public void setPickGrowthRateChange(float pickGrowthRateChange) {
+        this.pickGrowthRateChange = pickGrowthRateChange;
+    }
+
+    public String getPrimary_attr() {
+        return primary_attr;
+    }
+
+    public void setPrimary_attr(String primary_attr) {
+        this.primary_attr = primary_attr;
     }
 
     public float getWinRate() {

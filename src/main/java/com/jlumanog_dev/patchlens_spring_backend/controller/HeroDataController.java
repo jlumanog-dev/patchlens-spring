@@ -1,6 +1,7 @@
 package com.jlumanog_dev.patchlens_spring_backend.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jlumanog_dev.patchlens_spring_backend.dto.HeroBasicDataDTO;
 import com.jlumanog_dev.patchlens_spring_backend.dto.HeroInsightDTO;
 import com.jlumanog_dev.patchlens_spring_backend.entity.Hero;
 import com.jlumanog_dev.patchlens_spring_backend.services.HeroService;
@@ -22,9 +23,22 @@ public class HeroDataController {
     private ModelMapper modelMapper;
 
     @Autowired
-    public HeroDataController(HeroService heroService, ObjectMapper objectMapper, ModelMapper modelMapper){
+    public HeroDataController(HeroService heroService, ObjectMapper objectMapper,ModelMapper modelMapper){
         this.heroService = heroService;
         this.modelMapper = modelMapper;
+    }
+    @GetMapping("/all-heroes")
+    public ResponseEntity<List<HeroBasicDataDTO>> allHeroes(){
+        List<Hero> allHeroes = this.heroService.retrieveAllHeroes();
+        List<HeroBasicDataDTO> allHeroesMappedDTO = new ArrayList<>();
+/*        Need to use DTO and map Hero to HeroBasicDataDTO because Jackson
+        library cannot serialize lazy-loaded entity object that is stil
+        considered "JPA-Managed entity"*/
+        for (Hero element : allHeroes){
+            HeroBasicDataDTO heroBasic = this.modelMapper.map(element, HeroBasicDataDTO.class);
+            allHeroesMappedDTO.add(heroBasic);
+        }
+        return ResponseEntity.ok(allHeroesMappedDTO);
     }
 
     @GetMapping("/top-heroes")
@@ -34,6 +48,35 @@ public class HeroDataController {
         List<HeroInsightDTO> insightDTOList = new ArrayList<>();
         float winRate;
 
+        int latest_pub_pick_trend;
+        int oldest_pub_pick_trend;
+        int pub_pick_trend_size;
+        float pickRateChanges;
+
+        for(Hero element : topPerformingHeroesList){
+            pub_pick_trend_size = element.getHeroStats().getPub_pick_trend().length;
+
+            //getting the top pick on previous day, not the current day
+            latest_pub_pick_trend = element.getHeroStats().getPub_pick_trend()[pub_pick_trend_size - 2];
+            oldest_pub_pick_trend = element.getHeroStats().getPub_pick_trend()[0];
+
+
+            winRate = (100 * ((float) element.getHeroStats().getPub_win() / (float) element.getHeroStats().getPub_pick()));
+
+            // ((prev_latest − earliest) / earliest) × 100
+            pickRateChanges = ( 100 *  ( (float) latest_pub_pick_trend - (float) oldest_pub_pick_trend) / (float) oldest_pub_pick_trend);
+            HeroInsightDTO insightDTO = this.modelMapper.map(element, HeroInsightDTO.class);
+            insightDTO.setWinRate(winRate);
+            insightDTO.setPickGrowthRateChange(pickRateChanges);
+            insightDTOList.add(insightDTO);
+        }
+
+
+        return ResponseEntity.ok(insightDTOList);
+    }
+
+/*    public List<HeroInsightDTO> heroInsightMethod(List<Hero> her){
+        float winRate;
         int latest_pub_pick_trend;
         int oldest_pub_pick_trend;
         int pub_pick_trend_size;
@@ -52,13 +95,11 @@ public class HeroDataController {
             System.out.println("Pick Rate Change: " + pickRateChanges);
             HeroInsightDTO insightDTO = this.modelMapper.map(element, HeroInsightDTO.class);
             insightDTO.setWinRate(winRate);
-            insightDTO.setPickRateChange(pickRateChanges);
+            insightDTO.setPickGrowthRateChange(pickRateChanges);
             insightDTOList.add(insightDTO);
             //topHeroes.put(element.getId(), element);
         }
-
-
-        return ResponseEntity.ok(insightDTOList);
     }
+ */
 
 }
