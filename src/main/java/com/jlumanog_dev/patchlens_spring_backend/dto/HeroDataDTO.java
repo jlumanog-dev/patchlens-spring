@@ -1,20 +1,5 @@
 package com.jlumanog_dev.patchlens_spring_backend.dto;
 
-
-/*id: number,
-localized_name: string,
-roles: Array<string>,
-attack_type: string,
-heroStats:{
-    id :number,
-    localized_name :string,
-    move_speed :number,
-    pub_pick :number,
-    pub_pick_trend :Array<number>,
-    pub_win :number,
-    pub_win_trend :Array<number>
-}*/
-
 import com.jlumanog_dev.patchlens_spring_backend.entity.HeroStats;
 
 public class HeroDataDTO {
@@ -24,9 +9,10 @@ public class HeroDataDTO {
     private String attack_type;
     private String primary_attr;
     private HeroStats heroStats;
-
     private float winRate;
     private float pickGrowthRateChange;
+    private String img;
+    private String icon;
 
     public float getPickGrowthRateChange() {
         return pickGrowthRateChange;
@@ -90,14 +76,20 @@ public class HeroDataDTO {
         this.heroStats = heroStats;
     }
 
+    public String getImg() {
+        return img;
+    }
 
+    public void setImg(String img) {
+        this.img = img;
+    }
 
-    /*private int id;
-    private float int_gain;
-    private String localized_name;
-    private int move_speed;
-    private int pub_pick;
-    private int[] pub_pick_trend;
-    private int pub_win;
-    private int[] pub_win_trend;*/
+    public String getIcon() {
+        return icon;
+    }
+
+    public void setIcon(String icon) {
+        this.icon = icon;
+    }
+
 }
