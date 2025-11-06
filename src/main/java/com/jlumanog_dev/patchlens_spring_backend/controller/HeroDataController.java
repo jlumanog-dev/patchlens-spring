@@ -2,7 +2,7 @@ package com.jlumanog_dev.patchlens_spring_backend.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jlumanog_dev.patchlens_spring_backend.dto.HeroBasicDataDTO;
-import com.jlumanog_dev.patchlens_spring_backend.dto.HeroInsightDTO;
+import com.jlumanog_dev.patchlens_spring_backend.dto.HeroDataDTO;
 import com.jlumanog_dev.patchlens_spring_backend.entity.Hero;
 import com.jlumanog_dev.patchlens_spring_backend.services.HeroService;
 import org.modelmapper.ModelMapper;
@@ -42,10 +42,10 @@ public class HeroDataController {
     }
 
     @GetMapping("/top-heroes")
-    public ResponseEntity<List<HeroInsightDTO>> topPerformingHeroes(){
+    public ResponseEntity<List<HeroDataDTO>> topPerformingHeroes(){
 
         List<Hero> topPerformingHeroesList = this.heroService.retrieveTopHeroesStats();
-        List<HeroInsightDTO> insightDTOList = new ArrayList<>();
+        List<HeroDataDTO> insightDTOList = new ArrayList<>();
         float winRate;
 
         int latest_pub_pick_trend;
@@ -65,7 +65,7 @@ public class HeroDataController {
 
             // ((prev_latest − earliest) / earliest) × 100
             pickRateChanges = ( 100 *  ( (float) latest_pub_pick_trend - (float) oldest_pub_pick_trend) / (float) oldest_pub_pick_trend);
-            HeroInsightDTO insightDTO = this.modelMapper.map(element, HeroInsightDTO.class);
+            HeroDataDTO insightDTO = this.modelMapper.map(element, HeroDataDTO.class);
             insightDTO.setWinRate(winRate);
             insightDTO.setPickGrowthRateChange(pickRateChanges);
             insightDTOList.add(insightDTO);
@@ -75,7 +75,7 @@ public class HeroDataController {
         return ResponseEntity.ok(insightDTOList);
     }
 
-/*    public List<HeroInsightDTO> heroInsightMethod(List<Hero> her){
+/*    public List<HeroDataDTO> heroInsightMethod(List<Hero> her){
         float winRate;
         int latest_pub_pick_trend;
         int oldest_pub_pick_trend;
@@ -93,7 +93,7 @@ public class HeroDataController {
             // ((prev_latest − earliest) / earliest) × 100
             pickRateChanges = ( 100 *  ( (float) latest_pub_pick_trend - (float) oldest_pub_pick_trend) / (float) oldest_pub_pick_trend);
             System.out.println("Pick Rate Change: " + pickRateChanges);
-            HeroInsightDTO insightDTO = this.modelMapper.map(element, HeroInsightDTO.class);
+            HeroDataDTO insightDTO = this.modelMapper.map(element, HeroDataDTO.class);
             insightDTO.setWinRate(winRate);
             insightDTO.setPickGrowthRateChange(pickRateChanges);
             insightDTOList.add(insightDTO);

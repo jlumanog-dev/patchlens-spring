@@ -17,7 +17,7 @@ heroStats:{
 
 import com.jlumanog_dev.patchlens_spring_backend.entity.HeroStats;
 
-public class HeroInsightDTO {
+public class HeroDataDTO {
     private int id;
     private String localized_name;
     private String[] roles;
@@ -89,6 +89,7 @@ public class HeroInsightDTO {
     public void setHeroStats(HeroStats heroStats) {
         this.heroStats = heroStats;
     }
+
 
 
     /*private int id;

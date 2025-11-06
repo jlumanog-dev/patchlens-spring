@@ -72,6 +72,12 @@ public class HeroStats {
     @Column(name = "pub_win_trend")
     private int[] pub_win_trend;
 
+    @Column(name = "img")
+    private String img;
+
+    @Column(name = "icon")
+    private String icon;
+
     // Getters and setters
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
@@ -129,4 +135,21 @@ public class HeroStats {
 
     public int[] getPub_win_trend() { return pub_win_trend; }
     public void setPub_win_trend(int[] pub_win_trend) { this.pub_win_trend = pub_win_trend; }
+
+
+    public String getIcon() {
+        return icon;
+    }
+
+    public void setIcon(String icon) {
+        this.icon = icon;
+    }
+
+    public String getImg() {
+        return img;
+    }
+
+    public void setImg(String img) {
+        this.img = img;
+    }
 }
