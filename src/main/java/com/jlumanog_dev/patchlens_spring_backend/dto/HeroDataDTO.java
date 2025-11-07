@@ -8,6 +8,12 @@ public class HeroDataDTO {
     private String[] roles;
     private String attack_type;
     private String primary_attr;
+
+    private int base_str;
+    private int base_agi;
+    private int base_int;
+    private int move_speed;
+
     private HeroStats heroStats;
     private float winRate;
     private float pickGrowthRateChange;

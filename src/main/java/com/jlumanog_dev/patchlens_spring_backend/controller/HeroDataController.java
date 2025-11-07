@@ -9,6 +9,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -45,7 +46,7 @@ public class HeroDataController {
     public ResponseEntity<List<HeroDataDTO>> topPerformingHeroes(){
 
         List<Hero> topPerformingHeroesList = this.heroService.retrieveTopHeroesStats();
-        List<HeroDataDTO> insightDTOList = new ArrayList<>();
+        List<HeroDataDTO> HeroDTOList = new ArrayList<>();
         float winRate;
 
         int latest_pub_pick_trend;
@@ -68,38 +69,18 @@ public class HeroDataController {
             HeroDataDTO insightDTO = this.modelMapper.map(element, HeroDataDTO.class);
             insightDTO.setWinRate(winRate);
             insightDTO.setPickGrowthRateChange(pickRateChanges);
-            insightDTOList.add(insightDTO);
+            HeroDTOList.add(insightDTO);
         }
-
-
-        return ResponseEntity.ok(insightDTOList);
+        return ResponseEntity.ok(HeroDTOList);
     }
 
-/*    public List<HeroDataDTO> heroInsightMethod(List<Hero> her){
-        float winRate;
-        int latest_pub_pick_trend;
-        int oldest_pub_pick_trend;
-        int pub_pick_trend_size;
-        float pickRateChanges;
-
-        for(Hero element : topPerformingHeroesList){
-            winRate = (100 * ((float) element.getHeroStats().getPub_win() / (float) element.getHeroStats().getPub_pick()));
-            pub_pick_trend_size = element.getHeroStats().getPub_pick_trend().length;
-
-            //getting the top pick on previous day, not the current day
-            latest_pub_pick_trend = element.getHeroStats().getPub_pick_trend()[pub_pick_trend_size - 2];
-            oldest_pub_pick_trend = element.getHeroStats().getPub_pick_trend()[0];
-
-            // ((prev_latest − earliest) / earliest) × 100
-            pickRateChanges = ( 100 *  ( (float) latest_pub_pick_trend - (float) oldest_pub_pick_trend) / (float) oldest_pub_pick_trend);
-            System.out.println("Pick Rate Change: " + pickRateChanges);
-            HeroDataDTO insightDTO = this.modelMapper.map(element, HeroDataDTO.class);
-            insightDTO.setWinRate(winRate);
-            insightDTO.setPickGrowthRateChange(pickRateChanges);
-            insightDTOList.add(insightDTO);
-            //topHeroes.put(element.getId(), element);
-        }
+    @GetMapping("/{id}")
+    public ResponseEntity<HeroDataDTO> getHero(@PathVariable int id){
+        Hero hero = this.heroService.retrieveOneHero(id);
+        HeroDataDTO heroDataDTO = this.modelMapper.map(hero, HeroDataDTO.class);
+        return ResponseEntity.ok(heroDataDTO);
     }
- */
+
+
 
 }

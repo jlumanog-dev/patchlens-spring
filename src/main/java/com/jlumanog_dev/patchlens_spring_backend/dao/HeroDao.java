@@ -8,6 +8,7 @@ public interface HeroDao {
     public void saveAll(Hero[] allHeroes);
     public List<Hero> retrieveTopHeroesStats();
     public List<Hero> retrieveAllHeroes();
+    public Hero retrieveOneHero(int id);
 }
 
 

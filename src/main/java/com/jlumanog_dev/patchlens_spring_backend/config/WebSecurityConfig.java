@@ -41,7 +41,6 @@ public class WebSecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception{
         httpSecurity.authorizeHttpRequests(configurer ->
                 configurer.requestMatchers(HttpMethod.POST, "/api/register", "/api/login").permitAll()
-                        //Change this later to require incoming request for /api/heroes to be authenticated
                         .requestMatchers("/api/opendota/**").permitAll()
                         .requestMatchers("/api/user").hasRole("USER")
                         .requestMatchers("/api/heroes/**").hasRole("USER").anyRequest().authenticated()

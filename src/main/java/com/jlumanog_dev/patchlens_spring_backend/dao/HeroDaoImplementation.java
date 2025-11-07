@@ -38,4 +38,11 @@ public class HeroDaoImplementation implements HeroDao {
 
         return heroesQuery.getResultList();
     }
+    @Override
+    public Hero retrieveOneHero(int id){
+        //try catch later maybe
+        TypedQuery<Hero> query = this.entityManager.createQuery("Select hero FROM Hero hero JOIN FETCH hero.heroStats WHERE hero.id=:data", Hero.class);
+        query.setParameter("data", id);
+        return query.getSingleResult();
+    }
 }

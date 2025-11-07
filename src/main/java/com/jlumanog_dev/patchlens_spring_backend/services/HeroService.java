@@ -7,4 +7,5 @@ import java.util.List;
 public interface HeroService {
     public List<Hero> retrieveTopHeroesStats();
     public List<Hero>  retrieveAllHeroes();
+    public Hero retrieveOneHero(int id);
 }

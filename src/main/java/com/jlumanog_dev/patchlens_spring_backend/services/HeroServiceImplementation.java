@@ -25,4 +25,9 @@ public class HeroServiceImplementation implements HeroService{
         return this.heroDao.retrieveAllHeroes();
     }
 
+    @Override
+    public Hero retrieveOneHero(int id){
+        return this.heroDao.retrieveOneHero(id);
+    }
+
 }
