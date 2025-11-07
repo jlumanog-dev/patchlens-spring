@@ -2,6 +2,8 @@ package com.jlumanog_dev.patchlens_spring_backend.dto;
 
 import com.jlumanog_dev.patchlens_spring_backend.entity.HeroStats;
 
+import java.math.BigDecimal;
+
 public class HeroDataDTO {
     private int id;
     private String localized_name;
@@ -17,8 +19,26 @@ public class HeroDataDTO {
     private HeroStats heroStats;
     private float winRate;
     private float pickGrowthRateChange;
+    private float winGrowthRateChange;
+    private BigDecimal trendStdDev;
     private String img;
     private String icon;
+
+    public BigDecimal getTrendStdDev() {
+        return trendStdDev;
+    }
+
+    public void setTrendStdDev(BigDecimal trendStdDev) {
+        this.trendStdDev = trendStdDev;
+    }
+
+    public double getWinGrowthRateChange() {
+        return winGrowthRateChange;
+    }
+
+    public void setWinGrowthRateChange(float winGrowthRateChange) {
+        this.winGrowthRateChange = winGrowthRateChange;
+    }
 
     public float getPickGrowthRateChange() {
         return pickGrowthRateChange;
@@ -26,6 +46,12 @@ public class HeroDataDTO {
 
     public void setPickGrowthRateChange(float pickGrowthRateChange) {
         this.pickGrowthRateChange = pickGrowthRateChange;
+    }
+    public float getWinRate() {
+        return winRate;
+    }
+    public void setWinRate(float winRate) {
+        this.winRate = winRate;
     }
 
     public String getPrimary_attr() {
@@ -36,12 +62,6 @@ public class HeroDataDTO {
         this.primary_attr = primary_attr;
     }
 
-    public float getWinRate() {
-        return winRate;
-    }
-    public void setWinRate(float winRate) {
-        this.winRate = winRate;
-    }
     public int getId() {
         return id;
     }
