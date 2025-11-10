@@ -51,28 +51,33 @@ public class HeroDataController {
 
         List<Hero> topPerformingHeroesList = this.heroService.retrieveTopHeroesStats();
         List<HeroDataDTO> HeroDTOList = new ArrayList<>();
-        float winRate;
 
-        int latest_pub_pick_trend;
+/*        int latest_pub_pick_trend;
         int oldest_pub_pick_trend;
         int pub_pick_trend_size;
+        int pub_win_total;
         float pickRateChanges;
+        double averageWin;*/
 
         for(Hero element : topPerformingHeroesList){
-            pub_pick_trend_size = element.getHeroStats().getPub_pick_trend().length;
+            int pub_pick_trend_size = element.getHeroStats().getPub_pick_trend().length;
 
             //getting the top pick on previous day, not the current day
-            latest_pub_pick_trend = element.getHeroStats().getPub_pick_trend()[pub_pick_trend_size - 2];
-            oldest_pub_pick_trend = element.getHeroStats().getPub_pick_trend()[0];
+            int latest_pub_pick_trend = element.getHeroStats().getPub_pick_trend()[pub_pick_trend_size - 2];
+            int oldest_pub_pick_trend = element.getHeroStats().getPub_pick_trend()[0];
 
-
-            winRate = (100 * ((float) element.getHeroStats().getPub_win() / (float) element.getHeroStats().getPub_pick()));
+            float winRate = (100 * ((float) element.getHeroStats().getPub_win() / (float) element.getHeroStats().getPub_pick()));
 
             // ((prev_latest − earliest) / earliest) × 100
-            pickRateChanges = ( 100 *  ( ( ( (float) latest_pub_pick_trend - (float) oldest_pub_pick_trend)) / (float) oldest_pub_pick_trend ) );
+            float pickRateChanges = ( 100 *  ( ( ( (float) latest_pub_pick_trend - (float) oldest_pub_pick_trend)) / (float) oldest_pub_pick_trend ) );
+
+            double averageWin = (double) (element.getHeroStats().getPub_win() / 6);
+
             HeroDataDTO insightDTO = this.modelMapper.map(element, HeroDataDTO.class);
             insightDTO.setWinRate(winRate);
             insightDTO.setPickGrowthRateChange(pickRateChanges);
+            insightDTO.setTrendStdDev(this.standardDeviationMethod(element, averageWin));
+
             HeroDTOList.add(insightDTO);
         }
         return ResponseEntity.ok(HeroDTOList);
@@ -82,6 +87,7 @@ public class HeroDataController {
     public ResponseEntity<HeroDataDTO> getHero(@PathVariable int id){
         Hero hero = this.heroService.retrieveOneHero(id);
 
+        /* Metrics for Pub Ranked Games */
         int pub_pick_trend_size = hero.getHeroStats().getPub_pick_trend().length;
         int pub_win_trend_size = hero.getHeroStats().getPub_win_trend().length;
 
@@ -91,15 +97,21 @@ public class HeroDataController {
         int oldest_pub_win_trend = hero.getHeroStats().getPub_win_trend()[0];
 
         //subtract the 7th item out of the total sum of total win and pick
-        int pub_win_total = hero.getHeroStats().getPub_win() - hero.getHeroStats().getPub_win_trend()[pub_win_trend_size - 1];
-        int pub_pick_total = hero.getHeroStats().getPub_pick() - hero.getHeroStats().getPub_pick_trend()[pub_pick_trend_size - 1];
+        int pub_win_total = hero.getHeroStats().getPub_win() - hero.getHeroStats().getPub_win_trend()[pub_win_trend_size - 2];
+        int pub_pick_total = hero.getHeroStats().getPub_pick() - hero.getHeroStats().getPub_pick_trend()[pub_pick_trend_size - 2];
 
-        float winRate = (100 *  ( (float) pub_win_total / pub_pick_total));
-        float pickRateChanges = (100 * ((float) (latest_pub_pick_trend - oldest_pub_pick_trend) / oldest_pub_pick_trend));
-        float winRateChanges = (100 * ((float) (latest_pub_win_trend - oldest_pub_win_trend) / oldest_pub_win_trend));
+        float pubWinRate = this.winRateMethod(pub_win_total, pub_pick_total);
+        float pickRateChanges = this.growthRateMethod(latest_pub_pick_trend, oldest_pub_pick_trend);
+        float winRateChanges = this.growthRateMethod(latest_pub_win_trend, oldest_pub_win_trend);
 
+        /*Metrics for Pro/Official Tournament Games*/
+        int pro_pick_total = hero.getHeroStats().getPro_pick();
+        int pro_win_total = hero.getHeroStats().getPro_win();
 
+        float proWinRate = this.winRateMethod(pro_win_total, pro_pick_total);
 
+        float disparityScore = this.disparityScore(proWinRate, pubWinRate);
+        System.out.println("Pro: " + proWinRate + "\nPub: " + pubWinRate);
         //STANDARD DEVIATION PROCESS START HERE
         /* again, excluding the 7th day because it's the on-constant data that
         always updates. Might change later */
@@ -107,17 +119,30 @@ public class HeroDataController {
         System.out.println("pub total win minus last element: " + pub_win_total);
         double averageWin = (double) (pub_win_total / 6);
 
-        /*
+        BigDecimal standardDeviation = this.standardDeviationMethod(hero, averageWin);
+
+        HeroDataDTO heroDataDTO = this.modelMapper.map(hero, HeroDataDTO.class);
+        heroDataDTO.setWinRate(pubWinRate);
+        heroDataDTO.setPickGrowthRateChange(pickRateChanges);
+        heroDataDTO.setWinGrowthRateChange(winRateChanges);
+        heroDataDTO.setTrendStdDev(standardDeviation);
+        heroDataDTO.setDisparityScore(disparityScore);
+        return ResponseEntity.ok(heroDataDTO);
+    }
+
+
+    /*
         1. compute the difference between each pub wins per day and the average win value
         2. get the square of each difference and get the total sum of it all.
         3. divide the total sum by 6 (6 days)
         4. get the square root of the quotient.
         Needs to be BigDecimal because java basic data type can't return precise large value, instead just return concise values
-        */
+    */
+    public BigDecimal standardDeviationMethod(Hero hero, double averageWin ){
         ArrayList<BigDecimal> deviationList = new ArrayList<>();
         BigDecimal standardDeviation = new BigDecimal("0.0");
 
-        for (int i = 0; i < hero.getHeroStats().getPub_win_trend().length - 1; i++) {
+        for (int i = 0; i < hero.getHeroStats().getPub_win_trend().length; i++) {
             BigDecimal difference =  BigDecimal.valueOf(hero.getHeroStats().getPub_win_trend()[i] - averageWin);
             System.out.println("difference: " + difference);
 
@@ -131,14 +156,16 @@ public class HeroDataController {
         standardDeviation = standardDeviation.divide(BigDecimal.valueOf(6), mc); // Divide the total sum to 6 (6 days)
         standardDeviation = standardDeviation.sqrt(mc); //get square root of the current 'standardDeviation' value.
 
-        HeroDataDTO heroDataDTO = this.modelMapper.map(hero, HeroDataDTO.class);
-        heroDataDTO.setWinRate(winRate);
-        heroDataDTO.setPickGrowthRateChange(pickRateChanges);
-        heroDataDTO.setWinGrowthRateChange(winRateChanges);
-        heroDataDTO.setTrendStdDev(standardDeviation);
-        return ResponseEntity.ok(heroDataDTO);
+        return standardDeviation;
     }
-
-
+    public float winRateMethod(int win_total, int pick_total){
+        return (100 *  ( (float) win_total / pick_total));
+    }
+    public float growthRateMethod(int latest_pick_trend, int oldest_pick_trend){
+        return (100 * ((float) (latest_pick_trend - oldest_pick_trend) / oldest_pick_trend));
+    }
+    public float disparityScore(float proWinRate, float pubWinRate){
+        return proWinRate - pubWinRate;
+    }
 
 }

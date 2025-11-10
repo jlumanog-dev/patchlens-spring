@@ -21,8 +21,18 @@ public class HeroDataDTO {
     private float pickGrowthRateChange;
     private float winGrowthRateChange;
     private BigDecimal trendStdDev;
+    private float disparityScore;
     private String img;
     private String icon;
+
+
+    public float getDisparityScore() {
+        return disparityScore;
+    }
+
+    public void setDisparityScore(float disparityScore) {
+        this.disparityScore = disparityScore;
+    }
 
     public BigDecimal getTrendStdDev() {
         return trendStdDev;
