@@ -52,12 +52,6 @@ public class HeroDataController {
         List<Hero> topPerformingHeroesList = this.heroService.retrieveTopHeroesStats();
         List<HeroDataDTO> HeroDTOList = new ArrayList<>();
 
-/*        int latest_pub_pick_trend;
-        int oldest_pub_pick_trend;
-        int pub_pick_trend_size;
-        int pub_win_total;
-        float pickRateChanges;
-        double averageWin;*/
 
         for(Hero element : topPerformingHeroesList){
             int pub_pick_trend_size = element.getHeroStats().getPub_pick_trend().length;
@@ -66,17 +60,20 @@ public class HeroDataController {
             int latest_pub_pick_trend = element.getHeroStats().getPub_pick_trend()[pub_pick_trend_size - 2];
             int oldest_pub_pick_trend = element.getHeroStats().getPub_pick_trend()[0];
 
-            float winRate = (100 * ((float) element.getHeroStats().getPub_win() / (float) element.getHeroStats().getPub_pick()));
-
+            float pubWinRate = this.winRateMethod(element.getHeroStats().getPub_win(), element.getHeroStats().getPub_pick());
+            float proWinRate = this.winRateMethod(element.getHeroStats().getPro_win(), element.getHeroStats().getPro_pick());
             // ((prev_latest − earliest) / earliest) × 100
-            float pickRateChanges = ( 100 *  ( ( ( (float) latest_pub_pick_trend - (float) oldest_pub_pick_trend)) / (float) oldest_pub_pick_trend ) );
+            float pickRateChanges = this.growthRateMethod(latest_pub_pick_trend, oldest_pub_pick_trend);
+
+            float disparityScore = this.disparityScore(proWinRate, pubWinRate);
 
             double averageWin = (double) (element.getHeroStats().getPub_win() / 6);
 
             HeroDataDTO insightDTO = this.modelMapper.map(element, HeroDataDTO.class);
-            insightDTO.setWinRate(winRate);
+            insightDTO.setWinRate(pubWinRate);
             insightDTO.setPickGrowthRateChange(pickRateChanges);
             insightDTO.setTrendStdDev(this.standardDeviationMethod(element, averageWin));
+            insightDTO.setDisparityScore(disparityScore);
 
             HeroDTOList.add(insightDTO);
         }

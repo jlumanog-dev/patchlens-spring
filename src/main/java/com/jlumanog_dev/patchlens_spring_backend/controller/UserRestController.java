@@ -40,15 +40,26 @@ public class UserRestController {
     }
 
     @PostMapping("/register")
-    public Map<String, Object> register(@RequestBody User payloadUser){
+    public ResponseEntity<Map<String, Object>> register(@RequestBody User payloadUser){
+        String temp = payloadUser.getPassword();
         Object encodePassword = this.passwordEncoder.encode(payloadUser.getPassword());
         String finalEncodedValue = "{bcrypt}" + encodePassword;
         payloadUser.setPassword(finalEncodedValue);
+        System.out.println(payloadUser.getUsername());
+        System.out.println(payloadUser.getPassword());
+        System.out.println(payloadUser.getEmail());
         this.userService.save(payloadUser);
 
+        UserDetails user;
+        String token;
+        Authentication authObject = this.authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(payloadUser.getUsername(), temp));
+        user = (UserDetails) authObject.getPrincipal();
+        token = jwtService.generateToken(user);
+
         Map<String, Object> response = new HashMap<>();
-        response.put("STATUS: ", HttpStatus.OK);
-        return response;
+        response.put("STATUS", HttpStatus.OK);
+        response.put("TOKEN", token);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/login")
@@ -80,7 +91,6 @@ public class UserRestController {
         UserDetails userDetails = (UserDetails) authUser.getPrincipal(); //map data from authentication object to user details to access username value later
 
         Map<String, Object> res = new HashMap<>();
-        System.out.println("inside /user GET");
         User user = this.userService.findByUsername(userDetails.getUsername());
 
         res.put("username", user.getUsername());

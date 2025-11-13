@@ -30,7 +30,8 @@ public class CustomUserDetailsServiceImpl implements UserDetailsService {
             throw new UsernameNotFoundException("Invalid credentials");
         }
         //creating a collection that contains object to be used for indicating the authenticated user's role
-        List<? extends GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole()));
-        return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), authorities);
+        //List<? extends GrantedAuthority> means a List of any subclass that extends/inherits GrantedAuthority
+        List<? extends GrantedAuthority> authority = List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole()));
+        return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), authority);
     }
 }
