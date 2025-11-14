@@ -141,9 +141,6 @@ public class HeroDataController {
 
         for (int i = 0; i < hero.getHeroStats().getPub_win_trend().length; i++) {
             BigDecimal difference =  BigDecimal.valueOf(hero.getHeroStats().getPub_win_trend()[i] - averageWin);
-            System.out.println("difference: " + difference);
-
-            System.out.println("squared: " + difference.pow(2));
             standardDeviation = standardDeviation.add(difference.pow(2));
         }
 

@@ -1,9 +1,11 @@
 package com.jlumanog_dev.patchlens_spring_backend.controller;
 
+import com.jlumanog_dev.patchlens_spring_backend.dto.HeroesPlayedByUserDTO;
 import com.jlumanog_dev.patchlens_spring_backend.dto.UserDTO;
 import com.jlumanog_dev.patchlens_spring_backend.entity.User;
 import com.jlumanog_dev.patchlens_spring_backend.exception.AuthenticationErrorException;
 import com.jlumanog_dev.patchlens_spring_backend.services.JwtService;
+import com.jlumanog_dev.patchlens_spring_backend.services.OpenDotaRestService;
 import com.jlumanog_dev.patchlens_spring_backend.services.UserService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,15 +34,17 @@ public class UserRestController {
     private AuthenticationManager authenticationManager;
     private JwtService jwtService;
     private ModelMapper modelMapper;
+    private OpenDotaRestService openDotaRestService;
 
     @Autowired
-    public UserRestController(ModelMapper modelMapper, UserService userService, AuthenticationManager authenticationManager, BCryptPasswordEncoder passwordEncoder, DelegatingPasswordEncoder delegatingPasswordEncoder, JwtService jwtService){
+    public UserRestController(OpenDotaRestService openDotaRestService, ModelMapper modelMapper, UserService userService, AuthenticationManager authenticationManager, BCryptPasswordEncoder passwordEncoder, DelegatingPasswordEncoder delegatingPasswordEncoder, JwtService jwtService){
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
         this.delegatingPasswordEncoder = delegatingPasswordEncoder;
         this.authenticationManager = authenticationManager;
         this.modelMapper = modelMapper;
         this.jwtService = jwtService;
+        this.openDotaRestService = openDotaRestService;
     }
 
     @PostMapping("/register")
@@ -95,10 +99,17 @@ public class UserRestController {
     public ResponseEntity<UserDTO> getUserData(){
         Authentication authUser = SecurityContextHolder.getContext().getAuthentication(); // retrieve the authenticated user from the SecurityContextHolder.
         UserDetails userDetails = (UserDetails) authUser.getPrincipal(); //map data from authentication object to user details to access username value later
-
-        Map<String, Object> res = new HashMap<>();
         User user = this.userService.findByUsername(userDetails.getUsername());
         UserDTO userDTO = this.modelMapper.map(user, UserDTO.class);
         return ResponseEntity.ok(userDTO);
+    }
+
+    @GetMapping("/user/heroes")
+    public ResponseEntity<HeroesPlayedByUserDTO[]> retrieveHeroesPlayedByUser(){
+        Authentication authUser = SecurityContextHolder.getContext().getAuthentication();
+        UserDetails userDetails = (UserDetails) authUser.getPrincipal();
+        User user = this.userService.findByUsername(userDetails.getUsername());
+        HeroesPlayedByUserDTO[] playedByUserDTO = this.openDotaRestService.retrieveHeroesPlayed(user.getSteamId());
+        return ResponseEntity.ok(playedByUserDTO);
     }
 }

@@ -1,6 +1,7 @@
 package com.jlumanog_dev.patchlens_spring_backend.services;
 
 import com.jlumanog_dev.patchlens_spring_backend.dao.HeroDao;
+import com.jlumanog_dev.patchlens_spring_backend.dto.HeroesPlayedByUserDTO;
 import com.jlumanog_dev.patchlens_spring_backend.entity.Hero;
 import com.jlumanog_dev.patchlens_spring_backend.entity.HeroStats;
 import jakarta.transaction.Transactional;
@@ -9,6 +10,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
+import java.math.BigInteger;
+import java.util.List;
 import java.util.Objects;
 
 
@@ -20,7 +23,11 @@ public class OpenDotaRestService {
     private HeroDao heroDao;
 
     //these API endpoints don't need keys at the moment
-    private String[] api = {"https://api.opendota.com/api/heroes", "https://api.opendota.com/api/heroStats"};
+    private String[] api = {
+            "https://api.opendota.com/api/heroes",
+            "https://api.opendota.com/api/heroStats",
+            "https://api.opendota.com/api/players/"
+    };
 
 
     @Autowired
@@ -57,6 +64,10 @@ public class OpenDotaRestService {
         }
     }
 
+    public HeroesPlayedByUserDTO[] retrieveHeroesPlayed(BigInteger steamId){
+        HeroesPlayedByUserDTO[] playedByUserDTO = this.dotaRestTemplate.getForObject(this.api[2] + steamId.toString() + "/heroes", HeroesPlayedByUserDTO[].class);
+        return playedByUserDTO;
+    }
 
 
 }

@@ -7,7 +7,6 @@ import java.math.BigInteger;
 public class UserDTO {
     private String username;
     private String email;
-    private String role;
     private BigInteger steamId;
 
     public BigInteger getSteamId() {
@@ -24,14 +23,6 @@ public class UserDTO {
 
     public void setUsername(String username) {
         this.username = username;
-    }
-
-    public String getRole() {
-        return role;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
     }
 
     public String getEmail() {
