@@ -2,6 +2,8 @@ package com.jlumanog_dev.patchlens_spring_backend.entity;
 
 import jakarta.persistence.*;
 
+import java.math.BigInteger;
+
 @Entity
 @Table(name = "users")
 public class User {
@@ -20,6 +22,16 @@ public class User {
     @Column(name = "role")
     private String role;
 
+    @Column(name="steam_id")
+    private BigInteger steamId;
+
+    public BigInteger getSteamId() {
+        return steamId;
+    }
+
+    public void setSteamId(BigInteger steamId) {
+        this.steamId = steamId;
+    }
 
     public String getRole() {
         return role;

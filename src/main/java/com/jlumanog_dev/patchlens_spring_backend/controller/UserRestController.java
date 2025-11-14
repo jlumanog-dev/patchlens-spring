@@ -1,9 +1,11 @@
 package com.jlumanog_dev.patchlens_spring_backend.controller;
 
+import com.jlumanog_dev.patchlens_spring_backend.dto.UserDTO;
 import com.jlumanog_dev.patchlens_spring_backend.entity.User;
 import com.jlumanog_dev.patchlens_spring_backend.exception.AuthenticationErrorException;
 import com.jlumanog_dev.patchlens_spring_backend.services.JwtService;
 import com.jlumanog_dev.patchlens_spring_backend.services.UserService;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -28,20 +31,22 @@ public class UserRestController {
     private DelegatingPasswordEncoder delegatingPasswordEncoder;
     private AuthenticationManager authenticationManager;
     private JwtService jwtService;
+    private ModelMapper modelMapper;
 
     @Autowired
-    public UserRestController(UserService userService, AuthenticationManager authenticationManager, BCryptPasswordEncoder passwordEncoder, DelegatingPasswordEncoder delegatingPasswordEncoder, JwtService jwtService){
+    public UserRestController(ModelMapper modelMapper, UserService userService, AuthenticationManager authenticationManager, BCryptPasswordEncoder passwordEncoder, DelegatingPasswordEncoder delegatingPasswordEncoder, JwtService jwtService){
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
         this.delegatingPasswordEncoder = delegatingPasswordEncoder;
         this.authenticationManager = authenticationManager;
-
+        this.modelMapper = modelMapper;
         this.jwtService = jwtService;
     }
 
     @PostMapping("/register")
     public ResponseEntity<Map<String, Object>> register(@RequestBody User payloadUser){
         String temp = payloadUser.getPassword();
+        System.out.println(temp);
         Object encodePassword = this.passwordEncoder.encode(payloadUser.getPassword());
         String finalEncodedValue = "{bcrypt}" + encodePassword;
         payloadUser.setPassword(finalEncodedValue);
@@ -87,14 +92,13 @@ public class UserRestController {
     }
 
     @GetMapping("/user")
-    public ResponseEntity<Map<String, Object>> getUserData(){
+    public ResponseEntity<UserDTO> getUserData(){
         Authentication authUser = SecurityContextHolder.getContext().getAuthentication(); // retrieve the authenticated user from the SecurityContextHolder.
         UserDetails userDetails = (UserDetails) authUser.getPrincipal(); //map data from authentication object to user details to access username value later
 
         Map<String, Object> res = new HashMap<>();
         User user = this.userService.findByUsername(userDetails.getUsername());
-
-        res.put("username", user.getUsername());
-        return ResponseEntity.ok(res);
+        UserDTO userDTO = this.modelMapper.map(user, UserDTO.class);
+        return ResponseEntity.ok(userDTO);
     }
 }
