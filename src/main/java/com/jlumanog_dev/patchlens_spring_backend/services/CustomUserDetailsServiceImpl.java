@@ -14,6 +14,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+
+/*
+Note: the bean/instance for this is used on JwtAuthenticationFilter to retrieve username and role
+as UserDetails type used to compare it to JWT to determine if the token is valid with the correct role.
+
+*/
 @Service
 public class CustomUserDetailsServiceImpl implements UserDetailsService {
     private UserService userService;

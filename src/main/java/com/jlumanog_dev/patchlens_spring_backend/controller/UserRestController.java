@@ -45,6 +45,7 @@ public class UserRestController {
         Object encodePassword = this.passwordEncoder.encode(payloadUser.getPassword());
         String finalEncodedValue = "{bcrypt}" + encodePassword;
         payloadUser.setPassword(finalEncodedValue);
+        payloadUser.setRole("USER");
         System.out.println(payloadUser.getUsername());
         System.out.println(payloadUser.getPassword());
         System.out.println(payloadUser.getEmail());
