@@ -79,6 +79,27 @@ public class HeroDataController {
         }
         return ResponseEntity.ok(HeroDTOList);
     }
+    public int oldestPubPickOrWinChecker(int[] pub_trend){
+        //get oldest
+        int iterator = 0;
+        int oldest_pub_pick = 1;
+        while(pub_trend[iterator] == 0 && iterator != pub_trend.length - 1){
+            iterator++;
+        }
+        oldest_pub_pick = pub_trend[iterator];
+        return oldest_pub_pick;
+    }
+    public int latestPubPickOrWinChecker(int[] pub_trend){
+        int latestIndex = pub_trend.length - 2; // -2 to exclude the 7th element.
+        int latest_pub_pick = 1;
+        for(int i = latestIndex; i >= 0; i--){
+            if(pub_trend[latestIndex] > 0){
+                latest_pub_pick = pub_trend[i];
+                break;
+            }
+        }
+        return latest_pub_pick;
+    }
 
     @GetMapping("/{id}")
     public ResponseEntity<HeroDataDTO> getHero(@PathVariable int id){
@@ -88,14 +109,14 @@ public class HeroDataController {
         int pub_pick_trend_size = hero.getHeroStats().getPub_pick_trend().length;
         int pub_win_trend_size = hero.getHeroStats().getPub_win_trend().length;
 
-        int latest_pub_pick_trend = hero.getHeroStats().getPub_pick_trend()[pub_pick_trend_size - 2]; // -2 to get the second last element. might change later to use the latest live data;
-        int oldest_pub_pick_trend = hero.getHeroStats().getPub_pick_trend()[0];
-        int latest_pub_win_trend = hero.getHeroStats().getPub_win_trend()[pub_pick_trend_size - 2]; // -2 to get the second last element. might change later to use the latest live data;
-        int oldest_pub_win_trend = hero.getHeroStats().getPub_win_trend()[0];
+        int latest_pub_pick_trend = this.latestPubPickOrWinChecker(hero.getHeroStats().getPub_pick_trend());
+        int oldest_pub_pick_trend = this.oldestPubPickOrWinChecker(hero.getHeroStats().getPub_pick_trend());
+        int latest_pub_win_trend = this.latestPubPickOrWinChecker(hero.getHeroStats().getPub_win_trend());
+        int oldest_pub_win_trend = this.oldestPubPickOrWinChecker(hero.getHeroStats().getPub_win_trend());
 
         //subtract the 7th item out of the total sum of total win and pick
-        int pub_win_total = hero.getHeroStats().getPub_win() - hero.getHeroStats().getPub_win_trend()[pub_win_trend_size - 2];
-        int pub_pick_total = hero.getHeroStats().getPub_pick() - hero.getHeroStats().getPub_pick_trend()[pub_pick_trend_size - 2];
+        int pub_win_total = hero.getHeroStats().getPub_win() - hero.getHeroStats().getPub_win_trend()[pub_win_trend_size - 1];
+        int pub_pick_total = hero.getHeroStats().getPub_pick() - hero.getHeroStats().getPub_pick_trend()[pub_pick_trend_size - 1];
 
         float pubWinRate = this.winRateMethod(pub_win_total, pub_pick_total);
         float pickRateChanges = this.growthRateMethod(latest_pub_pick_trend, oldest_pub_pick_trend);
@@ -109,11 +130,9 @@ public class HeroDataController {
 
         float disparityScore = this.disparityScore(proWinRate, pubWinRate);
         System.out.println("Pro: " + proWinRate + "\nPub: " + pubWinRate);
-        //STANDARD DEVIATION PROCESS START HERE
-        /* again, excluding the 7th day because it's the on-constant data that
+        /*STANDARD DEVIATION PROCESS START HERE
+        again, excluding the 7th day because it's the on-constant data that
         always updates. Might change later */
-
-        System.out.println("pub total win minus last element: " + pub_win_total);
         double averageWin = (double) (pub_win_total / 6);
 
         BigDecimal standardDeviation = this.standardDeviationMethod(hero, averageWin);
@@ -124,6 +143,8 @@ public class HeroDataController {
         heroDataDTO.setWinGrowthRateChange(winRateChanges);
         heroDataDTO.setTrendStdDev(standardDeviation);
         heroDataDTO.setDisparityScore(disparityScore);
+        System.out.println("Pick growth rate: " + heroDataDTO.getPickGrowthRateChange());
+        System.out.println("Win growth rate: " + heroDataDTO.getWinGrowthRateChange());
         return ResponseEntity.ok(heroDataDTO);
     }
 
@@ -135,6 +156,7 @@ public class HeroDataController {
         4. get the square root of the quotient.
         Needs to be BigDecimal because java basic data type can't return precise large value, instead just return concise values
     */
+
     public BigDecimal standardDeviationMethod(Hero hero, double averageWin ){
         ArrayList<BigDecimal> deviationList = new ArrayList<>();
         BigDecimal standardDeviation = new BigDecimal("0.0");
