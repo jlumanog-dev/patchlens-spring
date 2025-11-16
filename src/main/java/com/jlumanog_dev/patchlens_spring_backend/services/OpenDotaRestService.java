@@ -44,17 +44,25 @@ public class OpenDotaRestService {
             HeroStats[] heroStats = this.dotaRestTemplate.getForObject(this.api[1], HeroStats[].class);
 
             //assume both heroes and heroStats have exact same length
-            assert Objects.requireNonNull(heroes).length == Objects.requireNonNull(heroStats).length;
-
+           assert Objects.requireNonNull(heroes).length == Objects.requireNonNull(heroStats).length;
+            System.out.println("hero size: " + heroes.length);
+            System.out.println("hero_stats size: " + heroStats.length);
             //each hero is associated with their respective heroStats
-            for(int i = 0; i < heroes.  length; i++) {
+            for(int i = 0; i < heroes.length; i++) {
                 /* making sure that the current hero element is associated with the current hero stats element/object
                 by checking their localized_name values*/
                 System.out.println("from heroes: " + heroes[i].getLocalized_name());
                 System.out.println("from herostats: " + heroStats[i].getLocalized_name());
+                System.out.println("ID: " + heroes[i].getId());
+                System.out.println("Hero Stat ID: " + heroStats[i].getId());
                 if (heroes[i].getLocalized_name().equals(heroStats[i].getLocalized_name())) {
-                    System.out.println(i);
                     heroes[i].setHeroStats(heroStats[i]); //this will make sure to cascade persist operation of heroStats object for HeroStats entity
+                }else if(heroes[i].getId() == heroStats[i].getId()){
+                    //This is for cases where localized Hero names are not the same
+                    //OD and Ring master have different names
+                    heroes[i].setHeroStats(heroStats[i]);
+                }else{
+                    System.out.println("NOT MATCH");
                 }
             }
             this.heroDao.saveAll(heroes); // persist an array of Heroes. Should also perform cascade persist/merge

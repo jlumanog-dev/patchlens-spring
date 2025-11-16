@@ -10,6 +10,15 @@ public class HeroesPlayedByUserDTO {
     private int against_games;
     private int against_win;
 
+    private String localized_name;
+
+    public String getLocalized_name() {
+        return localized_name;
+    }
+    public void setLocalized_name(String localized_name) {
+        this.localized_name = localized_name;
+    }
+
     public int getHero_id() {
         return hero_id;
     }

@@ -2,8 +2,10 @@ package com.jlumanog_dev.patchlens_spring_backend.controller;
 
 import com.jlumanog_dev.patchlens_spring_backend.dto.HeroesPlayedByUserDTO;
 import com.jlumanog_dev.patchlens_spring_backend.dto.UserDTO;
+import com.jlumanog_dev.patchlens_spring_backend.entity.Hero;
 import com.jlumanog_dev.patchlens_spring_backend.entity.User;
 import com.jlumanog_dev.patchlens_spring_backend.exception.AuthenticationErrorException;
+import com.jlumanog_dev.patchlens_spring_backend.services.HeroService;
 import com.jlumanog_dev.patchlens_spring_backend.services.JwtService;
 import com.jlumanog_dev.patchlens_spring_backend.services.OpenDotaRestService;
 import com.jlumanog_dev.patchlens_spring_backend.services.UserService;
@@ -35,9 +37,9 @@ public class UserRestController {
     private JwtService jwtService;
     private ModelMapper modelMapper;
     private OpenDotaRestService openDotaRestService;
-
+    private HeroService heroService;
     @Autowired
-    public UserRestController(OpenDotaRestService openDotaRestService, ModelMapper modelMapper, UserService userService, AuthenticationManager authenticationManager, BCryptPasswordEncoder passwordEncoder, DelegatingPasswordEncoder delegatingPasswordEncoder, JwtService jwtService){
+    public UserRestController(HeroService heroService, OpenDotaRestService openDotaRestService, ModelMapper modelMapper, UserService userService, AuthenticationManager authenticationManager, BCryptPasswordEncoder passwordEncoder, DelegatingPasswordEncoder delegatingPasswordEncoder, JwtService jwtService){
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
         this.delegatingPasswordEncoder = delegatingPasswordEncoder;
@@ -45,6 +47,7 @@ public class UserRestController {
         this.modelMapper = modelMapper;
         this.jwtService = jwtService;
         this.openDotaRestService = openDotaRestService;
+        this.heroService = heroService;
     }
 
     @PostMapping("/register")
@@ -110,6 +113,15 @@ public class UserRestController {
         UserDetails userDetails = (UserDetails) authUser.getPrincipal();
         User user = this.userService.findByUsername(userDetails.getUsername());
         HeroesPlayedByUserDTO[] playedByUserDTO = this.openDotaRestService.retrieveHeroesPlayed(user.getSteamId());
+
+        Hero hero1 = this.heroService.retrieveOneHero(76);
+        System.out.println("OD: " + hero1.getLocalized_name());
+        for(HeroesPlayedByUserDTO element : playedByUserDTO){
+            System.out.println("Hero ID: " + element.getHero_id());
+            Hero hero = this.heroService.retrieveOneHero(element.getHero_id());
+            System.out.println("Hero name: " + hero.getLocalized_name());
+            element.setLocalized_name(hero.getLocalized_name());
+        }
         return ResponseEntity.ok(playedByUserDTO);
     }
 }
