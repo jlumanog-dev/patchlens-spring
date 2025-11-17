@@ -9,6 +9,24 @@ public class HeroesPlayedByUserDTO {
     private int with_win;
     private int against_games;
     private int against_win;
+    private String img;
+    private String[] roles;
+
+    public String[] getRoles() {
+        return roles;
+    }
+
+    public void setRoles(String[] roles) {
+        this.roles = roles;
+    }
+
+    public String getImg() {
+        return img;
+    }
+
+    public void setImg(String img) {
+        this.img = img;
+    }
 
     private String localized_name;
 

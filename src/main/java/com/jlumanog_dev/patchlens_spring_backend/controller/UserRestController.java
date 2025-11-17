@@ -121,6 +121,8 @@ public class UserRestController {
             Hero hero = this.heroService.retrieveOneHero(element.getHero_id());
             System.out.println("Hero name: " + hero.getLocalized_name());
             element.setLocalized_name(hero.getLocalized_name());
+            element.setImg(hero.getHeroStats().getImg());
+            element.setRoles(hero.getRoles());
         }
         return ResponseEntity.ok(playedByUserDTO);
     }
