@@ -160,9 +160,14 @@ public class HeroDataController {
     public BigDecimal standardDeviationMethod(Hero hero, double averageWin ){
         ArrayList<BigDecimal> deviationList = new ArrayList<>();
         BigDecimal standardDeviation = new BigDecimal("0.0");
-
-        for (int i = 0; i < hero.getHeroStats().getPub_win_trend().length; i++) {
+        //length - 1 to exclude the 7th data point
+        for (int i = 0; i < hero.getHeroStats().getPub_win_trend().length - 1; i++) {
+            //Check if data point is 0 because sometimes data sets from opendota have 0 values.
+            //Must skip it to avoid negative values
+            if(hero.getHeroStats().getPub_win_trend()[i] < 1)
+                continue;
             BigDecimal difference =  BigDecimal.valueOf(hero.getHeroStats().getPub_win_trend()[i] - averageWin);
+            System.out.println("difference" + difference);
             standardDeviation = standardDeviation.add(difference.pow(2));
         }
 
