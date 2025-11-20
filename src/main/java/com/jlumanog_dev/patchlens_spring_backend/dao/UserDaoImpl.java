@@ -7,11 +7,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class UserDaoImplementation implements UserDao {
+public class UserDaoImpl implements UserDao {
     private EntityManager entityManager;
 
     @Autowired
-    public UserDaoImplementation(EntityManager entityManager){
+    public UserDaoImpl(EntityManager entityManager){
         this.entityManager = entityManager;
     }
     public User findByUsername(Object username){

@@ -1,7 +1,4 @@
 package com.jlumanog_dev.patchlens_spring_backend.dto;
-
-import com.jlumanog_dev.patchlens_spring_backend.entity.HeroStats;
-
 import java.math.BigDecimal;
 
 public class HeroDataDTO {
@@ -16,7 +13,13 @@ public class HeroDataDTO {
     private int base_int;
     private int move_speed;
 
-    private HeroStats heroStats;
+    int[] pub_pick_trend;
+    int[] pub_win_trend;
+    int pub_pick;
+    int pub_win;
+    int pro_pick;
+    int pro_win;
+
     private float winRate;
     private float pickGrowthRateChange;
     private float winGrowthRateChange;
@@ -25,6 +28,54 @@ public class HeroDataDTO {
     private String img;
     private String icon;
 
+
+    public int getPub_win() {
+        return pub_win;
+    }
+
+    public void setPub_win(int pub_win) {
+        this.pub_win = pub_win;
+    }
+
+    public int getPub_pick() {
+        return pub_pick;
+    }
+
+    public void setPub_pick(int pub_pick) {
+        this.pub_pick = pub_pick;
+    }
+
+    public int getPro_pick() {
+        return pro_pick;
+    }
+
+    public void setPro_pick(int pro_pick) {
+        this.pro_pick = pro_pick;
+    }
+
+    public int getPro_win() {
+        return pro_win;
+    }
+
+    public void setPro_win(int pro_win) {
+        this.pro_win = pro_win;
+    }
+
+    public int[] getPub_pick_trend() {
+        return pub_pick_trend;
+    }
+
+    public void setPub_pick_trend(int[] pub_pick_trend) {
+        this.pub_pick_trend = pub_pick_trend;
+    }
+
+    public int[] getPub_win_trend() {
+        return pub_win_trend;
+    }
+
+    public void setPub_win_trend(int[] pub_win_trend) {
+        this.pub_win_trend = pub_win_trend;
+    }
 
     public float getDisparityScore() {
         return disparityScore;
@@ -102,14 +153,6 @@ public class HeroDataDTO {
 
     public void setRoles(String[] roles) {
         this.roles = roles;
-    }
-
-    public HeroStats getHeroStats() {
-        return heroStats;
-    }
-
-    public void setHeroStats(HeroStats heroStats) {
-        this.heroStats = heroStats;
     }
 
     public String getImg() {

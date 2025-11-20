@@ -1,11 +1,11 @@
 package com.jlumanog_dev.patchlens_spring_backend.controller;
 
+import com.jlumanog_dev.patchlens_spring_backend.dto.HeroDataDTO;
 import com.jlumanog_dev.patchlens_spring_backend.dto.HeroesPlayedByUserDTO;
 import com.jlumanog_dev.patchlens_spring_backend.dto.UserDTO;
-import com.jlumanog_dev.patchlens_spring_backend.entity.Hero;
 import com.jlumanog_dev.patchlens_spring_backend.entity.User;
 import com.jlumanog_dev.patchlens_spring_backend.exception.AuthenticationErrorException;
-import com.jlumanog_dev.patchlens_spring_backend.services.HeroService;
+import com.jlumanog_dev.patchlens_spring_backend.scheduler.HeroStatsScheduler;
 import com.jlumanog_dev.patchlens_spring_backend.services.JwtService;
 import com.jlumanog_dev.patchlens_spring_backend.services.OpenDotaRestService;
 import com.jlumanog_dev.patchlens_spring_backend.services.UserService;
@@ -36,18 +36,24 @@ public class UserRestController {
     private AuthenticationManager authenticationManager;
     private JwtService jwtService;
     private ModelMapper modelMapper;
-    private OpenDotaRestService openDotaRestService;
-    private HeroService heroService;
+    private HeroStatsScheduler heroStatsScheduler;
+
     @Autowired
-    public UserRestController(HeroService heroService, OpenDotaRestService openDotaRestService, ModelMapper modelMapper, UserService userService, AuthenticationManager authenticationManager, BCryptPasswordEncoder passwordEncoder, DelegatingPasswordEncoder delegatingPasswordEncoder, JwtService jwtService){
+    public UserRestController( OpenDotaRestService openDotaRestService,
+                               ModelMapper modelMapper,
+                               UserService userService,
+                               AuthenticationManager authenticationManager,
+                               BCryptPasswordEncoder passwordEncoder,
+                               DelegatingPasswordEncoder delegatingPasswordEncoder,
+                               JwtService jwtService,
+                               HeroStatsScheduler heroStatsScheduler){
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
         this.delegatingPasswordEncoder = delegatingPasswordEncoder;
         this.authenticationManager = authenticationManager;
         this.modelMapper = modelMapper;
         this.jwtService = jwtService;
-        this.openDotaRestService = openDotaRestService;
-        this.heroService = heroService;
+        this.heroStatsScheduler = heroStatsScheduler;
     }
 
     @PostMapping("/register")
@@ -112,18 +118,9 @@ public class UserRestController {
         Authentication authUser = SecurityContextHolder.getContext().getAuthentication();
         UserDetails userDetails = (UserDetails) authUser.getPrincipal();
         User user = this.userService.findByUsername(userDetails.getUsername());
-        HeroesPlayedByUserDTO[] playedByUserDTO = this.openDotaRestService.retrieveHeroesPlayed(user.getSteamId());
+        System.out.println("steam ID: " + user.getSteamId());
+        HeroesPlayedByUserDTO[] playedByUserDTO = this.heroStatsScheduler.heroesPlayedByUser(user.getSteamId());
 
-        Hero hero1 = this.heroService.retrieveOneHero(76);
-        System.out.println("OD: " + hero1.getLocalized_name());
-        for(HeroesPlayedByUserDTO element : playedByUserDTO){
-            System.out.println("Hero ID: " + element.getHero_id());
-            Hero hero = this.heroService.retrieveOneHero(element.getHero_id());
-            System.out.println("Hero name: " + hero.getLocalized_name());
-            element.setLocalized_name(hero.getLocalized_name());
-            element.setImg(hero.getHeroStats().getImg());
-            element.setRoles(hero.getRoles());
-        }
         return ResponseEntity.ok(playedByUserDTO);
     }
 }
