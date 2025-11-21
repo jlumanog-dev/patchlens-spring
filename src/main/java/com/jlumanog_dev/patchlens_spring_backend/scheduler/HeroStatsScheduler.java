@@ -1,5 +1,6 @@
 package com.jlumanog_dev.patchlens_spring_backend.scheduler;
 
+import com.github.benmanes.caffeine.cache.Cache;
 import com.jlumanog_dev.patchlens_spring_backend.dto.HeroDataDTO;
 import com.jlumanog_dev.patchlens_spring_backend.dto.HeroesPlayedByUserDTO;
 import com.jlumanog_dev.patchlens_spring_backend.services.OpenDotaRestService;
@@ -10,12 +11,15 @@ import org.springframework.cache.caffeine.CaffeineCache;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import javax.swing.text.html.Option;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @Component
@@ -88,15 +92,34 @@ public class HeroStatsScheduler {
         return heroesList;
     }
 
-    public HeroesPlayedByUserDTO[] heroesPlayedByUser(BigInteger user){
-        System.out.println("heroesPlayedByUser has been called - must be new game played");
+
+    public List<HeroesPlayedByUserDTO> heroesPlayedByUser(BigInteger user){
         CaffeineCache allHeroes = (CaffeineCache) this.cacheManager.getCache("allHeroesStatsCache");
         //call allHeroesStatsRefresh if this cache is empty
         if(allHeroes == null){
             this.allHeroesStatsRefresh();
         }
+        System.out.println("heroesPlayedByUser has been called - must be new game played");
+        List<HeroesPlayedByUserDTO> heroesPlayedList = this.openDotaRestService.retrieveHeroesPlayed(user);
+        assert allHeroes != null;
+        Cache<Object, Object> allHeroesNativeCache = allHeroes.getNativeCache();
 
-        return this.openDotaRestService.retrieveHeroesPlayed(user);
+        /* Since I'm not using Entity relationships and JPA advance mapping:
+        Need to retrieve the allHeroes cache and filter out which item matches heroes' ID from
+        heroesPlayedList so that I can assign the correct localized_name & img, and probably a few more*/
+        for (HeroesPlayedByUserDTO element : heroesPlayedList){
+            allHeroesNativeCache.asMap().forEach((key, value) -> {
+                //The value should be a list of type HeroDataDTO.
+                Optional<HeroDataDTO> heroItem = ((List<HeroDataDTO>) value).stream().filter(hero ->
+                        hero.getId() == element.getHero_id()).findFirst();
+                assert heroItem.isPresent();
+                element.setImg(heroItem.get().getImg());
+                element.setLocalized_name(heroItem.get().getLocalized_name());
+            });
+        }
+
+
+        return heroesPlayedList;
     }
 
     public double averageMethod(int[] pubWinTrend){

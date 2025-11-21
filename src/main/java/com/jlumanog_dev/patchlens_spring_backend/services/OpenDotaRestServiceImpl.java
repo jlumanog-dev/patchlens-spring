@@ -42,8 +42,16 @@ public class OpenDotaRestServiceImpl implements OpenDotaRestService {
     }
 
     @Override
-    public HeroesPlayedByUserDTO[] retrieveHeroesPlayed(BigInteger steamId){
-        return this.dotaRestTemplate.getForObject(this.api[1] + steamId.toString() + "/heroes", HeroesPlayedByUserDTO[].class);
+    public List<HeroesPlayedByUserDTO> retrieveHeroesPlayed(BigInteger steamId){
+        List<HeroesPlayedByUserDTO> heroesPlayedList;
+        try{
+            HeroesPlayedByUserDTO[] heroesPlayedArray = this.dotaRestTemplate.getForObject(this.api[1] + steamId.toString() + "/heroes", HeroesPlayedByUserDTO[].class);
+            assert heroesPlayedArray != null;
+            heroesPlayedList = Arrays.asList(heroesPlayedArray);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return heroesPlayedList;
     }
 
 }

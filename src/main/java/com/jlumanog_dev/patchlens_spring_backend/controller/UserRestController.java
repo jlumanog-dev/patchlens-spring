@@ -114,12 +114,12 @@ public class UserRestController {
     }
 
     @GetMapping("/user/heroes")
-    public ResponseEntity<HeroesPlayedByUserDTO[]> retrieveHeroesPlayedByUser(){
+    public ResponseEntity<List<HeroesPlayedByUserDTO>> retrieveHeroesPlayedByUser(){
         Authentication authUser = SecurityContextHolder.getContext().getAuthentication();
         UserDetails userDetails = (UserDetails) authUser.getPrincipal();
         User user = this.userService.findByUsername(userDetails.getUsername());
         System.out.println("steam ID: " + user.getSteamId());
-        HeroesPlayedByUserDTO[] playedByUserDTO = this.heroStatsScheduler.heroesPlayedByUser(user.getSteamId());
+        List<HeroesPlayedByUserDTO> playedByUserDTO = this.heroStatsScheduler.heroesPlayedByUser(user.getSteamId());
 
         return ResponseEntity.ok(playedByUserDTO);
     }

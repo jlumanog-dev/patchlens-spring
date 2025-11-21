@@ -9,5 +9,5 @@ import java.util.List;
 public interface OpenDotaRestService {
     /*public HeroDataDTO retrieveAHero(int id);*/
     public List<HeroDataDTO> retrieveAllHeroes();
-    public HeroesPlayedByUserDTO[] retrieveHeroesPlayed(BigInteger steamId);
+    public List<HeroesPlayedByUserDTO> retrieveHeroesPlayed(BigInteger steamId);
 }
