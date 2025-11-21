@@ -17,6 +17,7 @@ import java.math.BigInteger;
 import java.math.MathContext;
 import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -88,8 +89,12 @@ public class HeroStatsScheduler {
             float disparityProToPub = this.disparityScore(proWinRate, pubWinRate);
             element.setDisparityScore(disparityProToPub);
         }
+
+        //sorting the list based on highest win rate and disparity score (pro-to-pub) in descending order
+        heroesList.sort(Comparator.comparing(HeroDataDTO::getWinRate).thenComparing(HeroDataDTO::getDisparityScore).reversed());
+        List<HeroDataDTO> topHeroes = heroesList.stream().limit(3).toList();
         System.out.println("topHeroStatsRefresh has been called");
-        return heroesList;
+        return topHeroes;
     }
 
 
@@ -114,6 +119,7 @@ public class HeroStatsScheduler {
                         hero.getId() == element.getHero_id()).findFirst();
                 assert heroItem.isPresent();
                 element.setImg(heroItem.get().getImg());
+                element.setRoles(heroItem.get().getRoles());
                 element.setLocalized_name(heroItem.get().getLocalized_name());
             });
         }
