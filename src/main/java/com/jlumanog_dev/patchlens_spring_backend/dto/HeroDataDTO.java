@@ -28,6 +28,37 @@ public class HeroDataDTO {
     private String img;
     private String icon;
 
+    public int getBase_str() {
+        return base_str;
+    }
+
+    public void setBase_str(int base_str) {
+        this.base_str = base_str;
+    }
+
+    public int getBase_int() {
+        return base_int;
+    }
+
+    public void setBase_int(int base_int) {
+        this.base_int = base_int;
+    }
+
+    public int getBase_agi() {
+        return base_agi;
+    }
+
+    public void setBase_agi(int base_agi) {
+        this.base_agi = base_agi;
+    }
+
+    public int getMove_speed() {
+        return move_speed;
+    }
+
+    public void setMove_speed(int move_speed) {
+        this.move_speed = move_speed;
+    }
 
     public int getPub_win() {
         return pub_win;
