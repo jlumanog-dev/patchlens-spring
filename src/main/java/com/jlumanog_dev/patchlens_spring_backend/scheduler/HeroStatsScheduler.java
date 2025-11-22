@@ -42,7 +42,9 @@ public class HeroStatsScheduler {
         }
     }*/
 
+    //omitted the schedule annotation because caffeine refreshes now every 'n' minutes - check Cache config
     @Scheduled(fixedRate = 15 * 60 * 1000) //15 minutes
+    /*@Scheduled(fixedRate = 2 * 60 * 1000)*/ //2 minutes
     @Cacheable(value = "allHeroesStatsCache") // this annotation caches the return value and specifies the cache name
     public List<HeroDataDTO> allHeroesStatsRefresh() {
         List<HeroDataDTO> heroesList = this.openDotaRestService.retrieveAllHeroes();
@@ -70,12 +72,14 @@ public class HeroStatsScheduler {
             element.setWinGrowthRateChange(winPubGrowthRate);
             element.setPickGrowthRateChange(pickPubGrowthRate);
             element.setTrendStdDev(trendStability);
+            System.out.println(element.getImg());
         }
-        System.out.println("CALLED allHeroesStatsRefresh");
+        System.out.println("CALLED allHeroesStatsRefresh with images");
         return heroesList;
     }
 
     @Scheduled(fixedRate = 15 * 60 * 1000) //15 minutes
+    /*@Scheduled(fixedRate = 2 * 60 * 1000)*/ //2 minutes
     @Cacheable(value = "topHeroesStatsCache")
     public List<HeroDataDTO> topHeroStatsRefresh(){
         List<HeroDataDTO> heroesList = this.openDotaRestService.retrieveAllHeroes();
@@ -99,13 +103,10 @@ public class HeroStatsScheduler {
 
 
     public List<HeroesPlayedByUserDTO> heroesPlayedByUser(BigInteger user){
+        //there might be race condition issue here. fix later if possible
         CaffeineCache allHeroes = (CaffeineCache) this.cacheManager.getCache("allHeroesStatsCache");
-        //call allHeroesStatsRefresh if this cache is empty
-        if(allHeroes == null){
-            this.allHeroesStatsRefresh();
-        }
-        System.out.println("heroesPlayedByUser has been called - must be new game played");
         List<HeroesPlayedByUserDTO> heroesPlayedList = this.openDotaRestService.retrieveHeroesPlayed(user);
+        System.out.println("heroesPlayedByUser called");
         assert allHeroes != null;
         Cache<Object, Object> allHeroesNativeCache = allHeroes.getNativeCache();
 

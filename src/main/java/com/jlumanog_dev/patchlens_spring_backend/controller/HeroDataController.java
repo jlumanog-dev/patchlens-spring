@@ -36,14 +36,12 @@ public class HeroDataController {
     //returns list of heroes for search on frontend
     @GetMapping("/all-heroes")
     public ResponseEntity<List<HeroDataDTO>> allHeroes(){
-        System.out.println("/all-heroes called");
         List<HeroDataDTO> heroesList = this.heroStatsScheduler.allHeroesStatsRefresh();
         return ResponseEntity.ok(heroesList);
     }
     //top performing heroes with high winrate and pro-to-pub disparity score
     @GetMapping("/top-heroes")
     public ResponseEntity<List<HeroDataDTO>> topPerformingHeroes(){
-        System.out.println("/top-heroes called");
         List<HeroDataDTO> topHeroesList = this.heroStatsScheduler.topHeroStatsRefresh();
         return ResponseEntity.ok(topHeroesList);
     }
