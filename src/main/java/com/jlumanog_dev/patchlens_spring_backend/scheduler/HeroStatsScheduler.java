@@ -10,8 +10,6 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.caffeine.CaffeineCache;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-
-import javax.swing.text.html.Option;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;
@@ -20,7 +18,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @Component
@@ -114,6 +111,9 @@ public class HeroStatsScheduler {
         Need to retrieve the allHeroes cache and filter out which item matches heroes' ID from
         heroesPlayedList so that I can assign the correct localized_name & img, and probably a few more*/
         for (HeroesPlayedByUserDTO element : heroesPlayedList){
+            /*Reinder that the 'value' is a list of type HeroesPlayedByUserDTO itself, check the sout output and see.
+            The allHeroesNativeCache  is converted to a Map collection that contains only 1 value (allHeroesStatsCache)
+            to use the forEach method and access the actual value needed through 'value' object parameter.*/
             allHeroesNativeCache.asMap().forEach((key, value) -> {
                 //The value should be a list of type HeroDataDTO.
                 Optional<HeroDataDTO> heroItem = ((List<HeroDataDTO>) value).stream().filter(hero ->

@@ -26,12 +26,9 @@ public class HeroDataController {
 
 
     @Autowired
-    public HeroDataController(ObjectMapper objectMapper,
-                              ModelMapper modelMapper,
-                              CacheManager cacheManager,
-                              HeroStatsScheduler heroStatsScheduler){
-        this.modelMapper = modelMapper;
+    public HeroDataController(HeroStatsScheduler heroStatsScheduler, OpenDotaRestService openDotaRestService){
         this.heroStatsScheduler = heroStatsScheduler;
+        this.openDotaRestService = openDotaRestService;
     }
     //returns list of heroes for search on frontend
     @GetMapping("/all-heroes")
@@ -47,10 +44,10 @@ public class HeroDataController {
     }
 
     //individual hero stats, not user's stats on this hero but maybe later that may be the case
-/*    @GetMapping("/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<HeroDataDTO> getHero(@PathVariable int id){
-        HeroDataDTO[] heroesList = this.heroStatsScheduler.allHeroesStatsRefresh();
-
-    }*/
+        HeroDataDTO hero = this.openDotaRestService.retrieveHero(id);
+        return ResponseEntity.ok(hero);
+    }
 
 }

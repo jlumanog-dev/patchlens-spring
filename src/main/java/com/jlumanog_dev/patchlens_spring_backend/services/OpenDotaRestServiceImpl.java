@@ -2,20 +2,25 @@ package com.jlumanog_dev.patchlens_spring_backend.services;
 
 import com.jlumanog_dev.patchlens_spring_backend.dto.HeroDataDTO;
 import com.jlumanog_dev.patchlens_spring_backend.dto.HeroesPlayedByUserDTO;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.caffeine.CaffeineCache;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 
 //This service class is dedicated to retrieving game data from OpenDota API
 // and persisting it into all relevant database table
 @Service
 public class OpenDotaRestServiceImpl implements OpenDotaRestService {
     private RestTemplate dotaRestTemplate;
-
+    private CacheManager cacheManager;
     //these API endpoints don't need keys at the moment
     private String[] api = {
             "https://api.opendota.com/api/heroStats",
@@ -24,8 +29,9 @@ public class OpenDotaRestServiceImpl implements OpenDotaRestService {
 
 
     @Autowired
-    public OpenDotaRestServiceImpl(RestTemplate dotaRestTemplate){
+    public OpenDotaRestServiceImpl(RestTemplate dotaRestTemplate, CacheManager cacheManager, ModelMapper modelMapper){
         this.dotaRestTemplate = dotaRestTemplate;
+        this.cacheManager = cacheManager;
     }
     @Override
     public List<HeroDataDTO> retrieveAllHeroes(){
@@ -52,6 +58,22 @@ public class OpenDotaRestServiceImpl implements OpenDotaRestService {
             throw new RuntimeException(e);
         }
         return heroesPlayedList;
+    }
+
+    @Override
+    public HeroDataDTO retrieveHero(int heroId){
+        CaffeineCache allHeroesCache = (CaffeineCache) this.cacheManager.getCache("allHeroesStatsCache");
+        assert allHeroesCache != null;
+
+/*        allHeroesCache.getNativeCache().asMap().forEach((key, value) ->{
+            Optional<HeroDataDTO> temp = ((List<HeroDataDTO>) value)
+                    .stream().filter(hero -> hero.getId() == heroId).findFirst();
+            assert temp.isPresent();
+            heroRetrievedDTO = temp;
+        });*/
+        List<HeroDataDTO> allHeroesList = (List<HeroDataDTO>) allHeroesCache.getNativeCache().asMap().entrySet().iterator().next().getValue();
+        System.out.println(allHeroesList.stream().filter(element -> element.getId() == heroId).findFirst().get().getLocalized_name());
+        return allHeroesList.stream().filter(element -> element.getId() == heroId).findFirst().get();
     }
 
 }
