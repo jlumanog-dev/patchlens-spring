@@ -57,8 +57,8 @@ public class HeroStatsScheduler {
             int oldestWinPubPoint = this.oldestPubPickOrWinChecker(element.getPub_win_trend());
             float winPubGrowthRate = this.growthRateMethod(latestWinPubPoint, oldestWinPubPoint);
 
-            int latestPickPubPoint = this.latestPubPickOrWinChecker(element.getPub_win_trend());
-            int oldestPickPubPoint = this.oldestPubPickOrWinChecker(element.getPub_win_trend());
+            int latestPickPubPoint = this.latestPubPickOrWinChecker(element.getPub_pick_trend());
+            int oldestPickPubPoint = this.oldestPubPickOrWinChecker(element.getPub_pick_trend());
             float pickPubGrowthRate = this.growthRateMethod(latestPickPubPoint, oldestPickPubPoint);
 
 
