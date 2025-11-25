@@ -26,6 +26,7 @@ public class OpenDotaRestServiceImpl implements OpenDotaRestService {
             "https://api.opendota.com/api/heroStats",
             "https://api.opendota.com/api/players/"
     };
+    private String[] apiQueryParams = { "/recentMatches?game_mode=22" };
 
 
     @Autowired
@@ -72,7 +73,6 @@ public class OpenDotaRestServiceImpl implements OpenDotaRestService {
             heroRetrievedDTO = temp;
         });*/
         List<HeroDataDTO> allHeroesList = (List<HeroDataDTO>) allHeroesCache.getNativeCache().asMap().entrySet().iterator().next().getValue();
-        System.out.println(allHeroesList.stream().filter(element -> element.getId() == heroId).findFirst().get().getLocalized_name());
         return allHeroesList.stream().filter(element -> element.getId() == heroId).findFirst().get();
     }
 

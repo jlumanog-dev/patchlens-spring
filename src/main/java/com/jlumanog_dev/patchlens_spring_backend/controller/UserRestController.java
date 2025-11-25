@@ -64,9 +64,6 @@ public class UserRestController {
         String finalEncodedValue = "{bcrypt}" + encodePassword;
         payloadUser.setPassword(finalEncodedValue);
         payloadUser.setRole("USER");
-        System.out.println(payloadUser.getUsername());
-        System.out.println(payloadUser.getPassword());
-        System.out.println(payloadUser.getEmail());
         this.userService.save(payloadUser);
 
         UserDetails user;
@@ -118,7 +115,6 @@ public class UserRestController {
         Authentication authUser = SecurityContextHolder.getContext().getAuthentication();
         UserDetails userDetails = (UserDetails) authUser.getPrincipal();
         User user = this.userService.findByUsername(userDetails.getUsername());
-        System.out.println("steam ID: " + user.getSteamId());
         List<HeroesPlayedByUserDTO> playedByUserDTO = this.heroStatsScheduler.heroesPlayedByUser(user.getSteamId());
 
         return ResponseEntity.ok(playedByUserDTO);
