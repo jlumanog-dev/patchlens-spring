@@ -2,6 +2,7 @@ package com.jlumanog_dev.patchlens_spring_backend.services;
 
 import com.jlumanog_dev.patchlens_spring_backend.dto.HeroDataDTO;
 import com.jlumanog_dev.patchlens_spring_backend.dto.HeroesPlayedByUserDTO;
+import com.jlumanog_dev.patchlens_spring_backend.dto.RecentMatchesDTO;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
@@ -74,6 +75,17 @@ public class OpenDotaRestServiceImpl implements OpenDotaRestService {
         });*/
         List<HeroDataDTO> allHeroesList = (List<HeroDataDTO>) allHeroesCache.getNativeCache().asMap().entrySet().iterator().next().getValue();
         return allHeroesList.stream().filter(element -> element.getId() == heroId).findFirst().get();
+    }
+
+    @Override
+    public void retrieveRecentMatches(BigInteger steamId){
+        RecentMatchesDTO[] recentMatchesDTOList = this.dotaRestTemplate.getForObject(this.api[1] + steamId.toString() + this.apiQueryParams[0], RecentMatchesDTO[].class);
+        double kdaRatio;
+
+        for(RecentMatchesDTO element : recentMatchesDTOList){
+
+        }
+
     }
 
 }

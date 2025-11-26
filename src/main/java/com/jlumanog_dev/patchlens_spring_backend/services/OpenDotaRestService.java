@@ -11,4 +11,5 @@ public interface OpenDotaRestService {
     public List<HeroDataDTO> retrieveAllHeroes();
     public List<HeroesPlayedByUserDTO> retrieveHeroesPlayed(BigInteger steamId);
     public HeroDataDTO retrieveHero(int heroId);
+    public void retrieveRecentMatches(BigInteger steamId);
 }

@@ -3,6 +3,7 @@ package com.jlumanog_dev.patchlens_spring_backend.scheduler;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.jlumanog_dev.patchlens_spring_backend.dto.HeroDataDTO;
 import com.jlumanog_dev.patchlens_spring_backend.dto.HeroesPlayedByUserDTO;
+import com.jlumanog_dev.patchlens_spring_backend.dto.RecentMatchesDTO;
 import com.jlumanog_dev.patchlens_spring_backend.services.OpenDotaRestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;

@@ -37,6 +37,7 @@ public class UserRestController {
     private JwtService jwtService;
     private ModelMapper modelMapper;
     private HeroStatsScheduler heroStatsScheduler;
+    private OpenDotaRestService openDotaRestService;
 
     @Autowired
     public UserRestController( OpenDotaRestService openDotaRestService,
@@ -54,6 +55,7 @@ public class UserRestController {
         this.modelMapper = modelMapper;
         this.jwtService = jwtService;
         this.heroStatsScheduler = heroStatsScheduler;
+        this.openDotaRestService = openDotaRestService;
     }
 
     @PostMapping("/register")
@@ -116,7 +118,7 @@ public class UserRestController {
         UserDetails userDetails = (UserDetails) authUser.getPrincipal();
         User user = this.userService.findByUsername(userDetails.getUsername());
         List<HeroesPlayedByUserDTO> playedByUserDTO = this.heroStatsScheduler.heroesPlayedByUser(user.getSteamId());
-
+        this.openDotaRestService.retrieveRecentMatches(user.getSteamId());
         return ResponseEntity.ok(playedByUserDTO);
     }
 }
