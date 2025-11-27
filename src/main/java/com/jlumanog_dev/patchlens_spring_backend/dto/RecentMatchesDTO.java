@@ -22,6 +22,81 @@ public class RecentMatchesDTO {
     public int cluster;
     public int hero_variant;
 
+    public float kdaRatio;
+    public float gpmXpmEfficiency;
+    public float csPerMinEfficiency;
+    public float heroDmgEfficiency;
+    public float towerDmgEfficiency;
 
+    public RecentMatchesDTO(){
+        this.kdaRatio = kdaRatio;
+        this.gpmXpmEfficiency = gpmXpmEfficiency;
+        this.csPerMinEfficiency = csPerMinEfficiency;
+        this.heroDmgEfficiency = heroDmgEfficiency;
+        this.towerDmgEfficiency = towerDmgEfficiency;
+    }
 
+    public int getGold_per_min() {
+        return gold_per_min;
+    }
+
+    public int getXp_per_min() {
+        return xp_per_min;
+    }
+
+    public int getDuration() {
+        return duration;
+    }
+
+    public int getLast_hits() {
+        return last_hits;
+    }
+
+    public int getHero_damage() {
+        return hero_damage;
+    }
+
+    public int getTower_damage() {
+        return tower_damage;
+    }
+
+    public float getKdaRatio() {
+        return kdaRatio;
+    }
+
+    public void setKdaRatio(int kill, int death, int assist) {
+        this.kdaRatio = (float) (kill / assist) / Math.max(1, death);
+    }
+
+    public float getGpmXpmEfficiency() {
+        return gpmXpmEfficiency;
+    }
+
+    public void setGpmXpmEfficiency(int gpm, int xpm) {
+        this.gpmXpmEfficiency = (float) gpm / xpm;
+    }
+
+    public float getCsPerMinEfficiency() {
+        return csPerMinEfficiency;
+    }
+
+    public void setCsPerMinEfficiency(int lastHit, int duration) {
+        this.csPerMinEfficiency = (float) lastHit / ( (float) duration / 60);
+    }
+
+    public float getHeroDmgEfficiency() {
+        return heroDmgEfficiency;
+    }
+
+    public void setHeroDmgEfficiency(int heroDamage, int duration) {
+        this.heroDmgEfficiency = (float) heroDamage / ((float) duration / 60);
+    }
+
+    public float getTowerDmgEfficiency() {
+        return towerDmgEfficiency;
+    }
+
+    public void setTowerDmgEfficiency(int towerDamage, int duration) {
+        this.towerDmgEfficiency = (float) towerDamage / ((float) duration / 60);;
+    }
 }

@@ -80,10 +80,20 @@ public class OpenDotaRestServiceImpl implements OpenDotaRestService {
     @Override
     public void retrieveRecentMatches(BigInteger steamId){
         RecentMatchesDTO[] recentMatchesDTOList = this.dotaRestTemplate.getForObject(this.api[1] + steamId.toString() + this.apiQueryParams[0], RecentMatchesDTO[].class);
-        double kdaRatio;
+        float winRate;
+        float avgKDA;
+        float avgGPM;
+        float avgXPM;
+        float avgHeroDamage;
+        float avgTowerDamage;
+        float avgLastHit;
 
         for(RecentMatchesDTO element : recentMatchesDTOList){
-
+            element.setKdaRatio(element.kills, element.deaths, element.assists);
+            element.setGpmXpmEfficiency(element.getGold_per_min(), element.getXp_per_min());
+            element.setCsPerMinEfficiency(element.getLast_hits(), element.getDuration());
+            element.setHeroDmgEfficiency(element.getHero_damage(), element.getDuration());
+            element.setTowerDmgEfficiency(element.getTower_damage(), element.getDuration());
         }
 
     }
