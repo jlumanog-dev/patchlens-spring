@@ -2,6 +2,7 @@ package com.jlumanog_dev.patchlens_spring_backend.controller;
 
 import com.jlumanog_dev.patchlens_spring_backend.dto.HeroDataDTO;
 import com.jlumanog_dev.patchlens_spring_backend.dto.HeroesPlayedByUserDTO;
+import com.jlumanog_dev.patchlens_spring_backend.dto.RecentMatchAggregateDTO;
 import com.jlumanog_dev.patchlens_spring_backend.dto.UserDTO;
 import com.jlumanog_dev.patchlens_spring_backend.entity.User;
 import com.jlumanog_dev.patchlens_spring_backend.exception.AuthenticationErrorException;
@@ -120,5 +121,17 @@ public class UserRestController {
         List<HeroesPlayedByUserDTO> playedByUserDTO = this.heroStatsScheduler.heroesPlayedByUser(user.getSteamId());
         this.openDotaRestService.retrieveRecentMatches(user.getSteamId());
         return ResponseEntity.ok(playedByUserDTO);
+    }
+
+    @GetMapping("/user/recentMatches")
+    public ResponseEntity<RecentMatchAggregateDTO> retrieveRecentMatches(){
+        Authentication authUser = SecurityContextHolder.getContext().getAuthentication();
+        UserDetails userDetails = (UserDetails) authUser.getPrincipal();
+
+        //might add try catch here or some kind of exception handling
+        User user = this.userService.findByUsername(userDetails.getUsername());
+        UserDTO userDTO = this.modelMapper.map(user, UserDTO.class); // seems unnecessary, just making sure I'm using user object with no password field - might change later
+        this.openDotaRestService.retrieveRecentMatches(userDTO.getSteamId());
+        return ResponseEntity.ok(this.openDotaRestService.retrieveRecentMatches(userDTO.getSteamId()));
     }
 }
