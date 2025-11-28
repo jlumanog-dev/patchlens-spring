@@ -41,7 +41,7 @@ public class HeroStatsScheduler {
     }*/
 
     //omitted the schedule annotation because caffeine refreshes now every 'n' minutes - check Cache config
-    @Scheduled(fixedRate = 15 * 60 * 1000) //15 minutes
+    @Scheduled(fixedRate = 30 * 60 * 1000) //30 minutes
     /*@Scheduled(fixedRate = 2 * 60 * 1000)*/ //2 minutes
     @Cacheable(value = "allHeroesStatsCache") // this annotation caches the return value and specifies the cache name
     public List<HeroDataDTO> allHeroesStatsRefresh() {
@@ -76,7 +76,7 @@ public class HeroStatsScheduler {
         return heroesList;
     }
 
-    @Scheduled(fixedRate = 15 * 60 * 1000) //15 minutes
+    @Scheduled(fixedRate = 30 * 60 * 1000) //30 minutes
     /*@Scheduled(fixedRate = 2 * 60 * 1000)*/ //2 minutes
     @Cacheable(value = "topHeroesStatsCache")
     public List<HeroDataDTO> topHeroStatsRefresh(){

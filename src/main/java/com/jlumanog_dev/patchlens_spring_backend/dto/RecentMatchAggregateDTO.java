@@ -2,17 +2,19 @@ package com.jlumanog_dev.patchlens_spring_backend.dto;
 
 public class RecentMatchAggregateDTO {
     //computed fields
-    public int totalMatches;
-    public float winRate;
-    public float avgKDA;
-    public float avgGPM;
-    public float avgXPM;
-    public float avgHeroDamage;
-    public float avgTowerDamage;
+    private int totalMatches;
+    private float winRate;
+    private float avgKDA;
+    private float avgGPM;
+    private float avgXPM;
+    private float avgHeroDamage;
+    private float avgTowerDamage;
     public float avgLastHit;
+    private float avgLastHitPerMinute;
 
 
-    public RecentMatchAggregateDTO(int totalMatches, float winRate, float avgKDA, float avgGPM, float avgXPM, float avgHeroDamage, float avgTowerDamage, float avgLastHit) {
+
+    public RecentMatchAggregateDTO(int totalMatches, float winRate, float avgKDA, float avgGPM, float avgXPM, float avgHeroDamage, float avgTowerDamage, float avgLastHit, float avgLastHitPerMinute) {
         this.totalMatches = totalMatches;
         this.winRate = winRate;
         this.avgKDA = avgKDA;
@@ -21,6 +23,7 @@ public class RecentMatchAggregateDTO {
         this.avgHeroDamage = avgHeroDamage;
         this.avgTowerDamage = avgTowerDamage;
         this.avgLastHit = avgLastHit;
+        this.avgLastHitPerMinute = avgLastHitPerMinute;
     }
 
 }

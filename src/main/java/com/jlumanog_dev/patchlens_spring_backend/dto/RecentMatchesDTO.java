@@ -1,32 +1,32 @@
 package com.jlumanog_dev.patchlens_spring_backend.dto;
 
 public class RecentMatchesDTO {
-    public long match_id;
-    public int player_slot;
+    private long match_id;
+    private int player_slot;
     public boolean radiant_win;
-    public int hero_id;
-    public long start_time;
-    public int duration;
-    public int game_mode;
-    public int lobby_type;
-    public int kills;
-    public int deaths;
-    public int assists;
-    public int average_rank;
-    public int xp_per_min;
-    public int gold_per_min;
-    public int hero_damage;
-    public int tower_damage;
-    public int hero_healing;
-    public int last_hits;
-    public int cluster;
-    public int hero_variant;
+    private int hero_id;
+    private long start_time;
+    private int duration;
+    private int game_mode;
+    private int lobby_type;
+    private int kills;
+    private int deaths;
+    private int assists;
+    private int average_rank;
+    private int xp_per_min;
+    private int gold_per_min;
+    private int hero_damage;
+    private int tower_damage;
+    private int hero_healing;
+    private int last_hits;
+    private int cluster;
+    private int hero_variant;
 
-    public float kdaRatio;
-    public float gpmXpmEfficiency;
-    public float csPerMinEfficiency;
-    public float heroDmgEfficiency;
-    public float towerDmgEfficiency;
+    private float kdaRatio;
+    private float gpmXpmEfficiency;
+    private float csPerMinEfficiency;
+    private float heroDmgEfficiency;
+    private float towerDmgEfficiency;
 
     public RecentMatchesDTO(){
         this.kdaRatio = kdaRatio;
@@ -34,6 +34,38 @@ public class RecentMatchesDTO {
         this.csPerMinEfficiency = csPerMinEfficiency;
         this.heroDmgEfficiency = heroDmgEfficiency;
         this.towerDmgEfficiency = towerDmgEfficiency;
+    }
+
+    public long getMatch_id() {
+        return match_id;
+    }
+
+    public int getPlayer_slot() {
+        return player_slot;
+    }
+
+    public int getKills() {
+        return kills;
+    }
+
+    public void setKills(int kills) {
+        this.kills = kills;
+    }
+
+    public int getDeaths() {
+        return deaths;
+    }
+
+    public void setDeaths(int deaths) {
+        this.deaths = deaths;
+    }
+
+    public int getAssists() {
+        return assists;
+    }
+
+    public void setAssists(int assists) {
+        this.assists = assists;
     }
 
     public int getGold_per_min() {
