@@ -12,9 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
 //This service class is dedicated to retrieving game data from OpenDota API
@@ -79,7 +77,7 @@ public class OpenDotaRestServiceImpl implements OpenDotaRestService {
     }
 
     @Override
-    public RecentMatchAggregateDTO retrieveRecentMatches(BigInteger steamId){
+    public Map<String, Object> retrieveRecentMatches(BigInteger steamId){
         RecentMatchesDTO[] recentMatchesDTOList = this.dotaRestTemplate.getForObject(this.api[1] + steamId.toString() + this.apiQueryParams[0], RecentMatchesDTO[].class);
         //aggregate fields
         float winRate;
@@ -142,8 +140,10 @@ public class OpenDotaRestServiceImpl implements OpenDotaRestService {
                 + avgLastHit + "\naverage LH per Min: " + avgLastHitPerMinute + "\navg Hero Dmg: " +
                 avgHeroDamage + "\nAvg Tower Dmg: " + avgTowerDamage
         );
-
-        return new RecentMatchAggregateDTO(recentMatchesDTOList.length, winRate, avgKDA, avgGPM, avgXPM, avgHeroDamage, avgTowerDamage, avgLastHit, avgLastHitPerMinute);
+        Map<String, Object> matchMap = new HashMap<>();
+        matchMap.put("match_aggregate",  new RecentMatchAggregateDTO(recentMatchesDTOList.length, winRate, avgKDA, avgGPM, avgXPM, avgHeroDamage, avgTowerDamage, avgLastHit, avgLastHitPerMinute));
+        matchMap.put("match_list", recentMatchesDTOList);
+        return matchMap;
 
     }
 

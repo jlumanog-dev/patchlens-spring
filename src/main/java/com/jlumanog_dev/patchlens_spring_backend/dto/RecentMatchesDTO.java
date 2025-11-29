@@ -1,32 +1,32 @@
 package com.jlumanog_dev.patchlens_spring_backend.dto;
 
 public class RecentMatchesDTO {
-    private long match_id;
-    private int player_slot;
+    public long match_id;
+    public int player_slot;
     public boolean radiant_win;
-    private int hero_id;
-    private long start_time;
-    private int duration;
-    private int game_mode;
-    private int lobby_type;
-    private int kills;
-    private int deaths;
-    private int assists;
-    private int average_rank;
-    private int xp_per_min;
-    private int gold_per_min;
-    private int hero_damage;
-    private int tower_damage;
-    private int hero_healing;
-    private int last_hits;
-    private int cluster;
-    private int hero_variant;
+    public int hero_id;
+    public long start_time;
+    public int duration;
+    public int game_mode;
+    public int lobby_type;
+    public int kills;
+    public int deaths;
+    public int assists;
+    public int average_rank;
+    public int xp_per_min;
+    public int gold_per_min;
+    public int hero_damage;
+    public int tower_damage;
+    public int hero_healing;
+    public int last_hits;
+    public int cluster;
+    public int hero_variant;
 
-    private float kdaRatio;
-    private float gpmXpmEfficiency;
-    private float csPerMinEfficiency;
-    private float heroDmgEfficiency;
-    private float towerDmgEfficiency;
+    public float kdaRatio;
+    public float gpmXpmEfficiency;
+    public float csPerMinEfficiency;
+    public float heroDmgEfficiency;
+    public float towerDmgEfficiency;
 
     public RecentMatchesDTO(){
         this.kdaRatio = kdaRatio;

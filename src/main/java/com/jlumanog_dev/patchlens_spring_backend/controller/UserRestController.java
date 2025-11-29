@@ -124,14 +124,13 @@ public class UserRestController {
     }
 
     @GetMapping("/user/recentMatches")
-    public ResponseEntity<RecentMatchAggregateDTO> retrieveRecentMatches(){
+    public ResponseEntity<Map<String, Object>> retrieveRecentMatches(){
         Authentication authUser = SecurityContextHolder.getContext().getAuthentication();
         UserDetails userDetails = (UserDetails) authUser.getPrincipal();
 
         //might add try catch here or some kind of exception handling
         User user = this.userService.findByUsername(userDetails.getUsername());
         UserDTO userDTO = this.modelMapper.map(user, UserDTO.class); // seems unnecessary, just making sure I'm using user object with no password field - might change later
-        this.openDotaRestService.retrieveRecentMatches(userDTO.getSteamId());
         return ResponseEntity.ok(this.openDotaRestService.retrieveRecentMatches(userDTO.getSteamId()));
     }
 }

@@ -6,11 +6,12 @@ import com.jlumanog_dev.patchlens_spring_backend.dto.RecentMatchAggregateDTO;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Map;
 
 public interface OpenDotaRestService {
     /*public HeroDataDTO retrieveAHero(int id);*/
     public List<HeroDataDTO> retrieveAllHeroes();
     public List<HeroesPlayedByUserDTO> retrieveHeroesPlayed(BigInteger steamId);
     public HeroDataDTO retrieveHero(int heroId);
-    public RecentMatchAggregateDTO retrieveRecentMatches(BigInteger steamId);
+    public Map<String, Object> retrieveRecentMatches(BigInteger steamId);
 }
