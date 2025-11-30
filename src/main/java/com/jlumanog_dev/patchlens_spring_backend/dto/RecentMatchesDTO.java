@@ -21,6 +21,7 @@ public class RecentMatchesDTO {
     public int last_hits;
     public int cluster;
     public int hero_variant;
+    public String localized_name;
 
     public float kdaRatio;
     public float gpmXpmEfficiency;
@@ -35,6 +36,14 @@ public class RecentMatchesDTO {
         this.heroDmgEfficiency = heroDmgEfficiency;
         this.towerDmgEfficiency = towerDmgEfficiency;
     }*/
+
+    public String getLocalized_name() {
+        return localized_name;
+    }
+
+    public void setLocalized_name(String localized_name) {
+        this.localized_name = localized_name;
+    }
 
     public long getMatch_id() {
         return match_id;

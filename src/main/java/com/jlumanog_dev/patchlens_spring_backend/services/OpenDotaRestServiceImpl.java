@@ -77,6 +77,9 @@ public class OpenDotaRestServiceImpl implements OpenDotaRestService {
 
     @Override
     public Map<String, Object> retrieveRecentMatches(BigInteger steamId){
+        CaffeineCache allHeroesCache = (CaffeineCache) this.cacheManager.getCache("allHeroesStatsCache");
+        assert allHeroesCache != null;
+        List<HeroDataDTO> allHeroes =  (List<HeroDataDTO>) allHeroesCache.getNativeCache().asMap().entrySet().iterator().next().getValue();
         RecentMatchesDTO[] recentMatchesDTOList = this.dotaRestTemplate.getForObject(this.api[1] + steamId.toString() + this.apiQueryParams[0], RecentMatchesDTO[].class);
         //aggregate fields
         float winRate;
@@ -104,6 +107,9 @@ public class OpenDotaRestServiceImpl implements OpenDotaRestService {
             element.setCsPerMinEfficiency(element.getLast_hits(), element.getDuration());
             element.setHeroDmgEfficiency(element.getHero_damage(), element.getDuration());
             element.setTowerDmgEfficiency(element.getTower_damage(), element.getDuration());
+
+            HeroDataDTO tempHero = allHeroes.stream().filter(hero -> hero.getId() == element.hero_id).findFirst().get();
+            element.setLocalized_name(tempHero.getLocalized_name());
             if(element.radiant_win && element.getPlayer_slot() <= 127){
                 totalWins += 1;
             }
