@@ -87,11 +87,6 @@ public class UserRestController {
         UserDetails user;
         String token;
         try{
-            /*
-            passing an Authentication object type to authenticate()
-            The AuthenticationManager will then use an AuthenticationProvider, DelegatePasswordEncoder and
-            your CustomUserDetailsService to authenticate behind the scenes
-            */
             Authentication authObject = this.authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(payloadUser.getUsername(), payloadUser.getPassword()));
             user = (UserDetails) authObject.getPrincipal();
             token = this.jwtService.generateToken(user);
@@ -106,8 +101,8 @@ public class UserRestController {
 
     @GetMapping("/user")
     public ResponseEntity<UserDTO> getUserData(){
-        Authentication authUser = SecurityContextHolder.getContext().getAuthentication(); // retrieve the authenticated user from the SecurityContextHolder.
-        UserDetails userDetails = (UserDetails) authUser.getPrincipal(); //map data from authentication object to user details to access username value later
+        Authentication authUser = SecurityContextHolder.getContext().getAuthentication();
+        UserDetails userDetails = (UserDetails) authUser.getPrincipal();
         User user = this.userService.findByUsername(userDetails.getUsername());
         UserDTO userDTO = this.modelMapper.map(user, UserDTO.class);
         return ResponseEntity.ok(userDTO);

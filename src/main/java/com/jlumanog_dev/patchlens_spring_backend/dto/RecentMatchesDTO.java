@@ -28,13 +28,13 @@ public class RecentMatchesDTO {
     public float heroDmgEfficiency;
     public float towerDmgEfficiency;
 
-    public RecentMatchesDTO(){
+/*    public RecentMatchesDTO(){
         this.kdaRatio = kdaRatio;
         this.gpmXpmEfficiency = gpmXpmEfficiency;
         this.csPerMinEfficiency = csPerMinEfficiency;
         this.heroDmgEfficiency = heroDmgEfficiency;
         this.towerDmgEfficiency = towerDmgEfficiency;
-    }
+    }*/
 
     public long getMatch_id() {
         return match_id;
@@ -97,7 +97,7 @@ public class RecentMatchesDTO {
     }
 
     public void setKdaRatio(int kill, int death, int assist) {
-        this.kdaRatio = (float) (kill / assist) / Math.max(1, death);
+        this.kdaRatio =  (float) ( kill + assist) / Math.max(1, death);
     }
 
     public float getGpmXpmEfficiency() {

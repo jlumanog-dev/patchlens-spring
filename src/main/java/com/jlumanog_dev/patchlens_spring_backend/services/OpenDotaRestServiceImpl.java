@@ -36,7 +36,6 @@ public class OpenDotaRestServiceImpl implements OpenDotaRestService {
     }
     @Override
     public List<HeroDataDTO> retrieveAllHeroes(){
-        //send GET request, expecting an array of JSON data and mapping each to an DTO object (HeroDataDTO)
         List<HeroDataDTO> heroesList;
         try{
             HeroDataDTO[] heroes = this.dotaRestTemplate.getForObject(this.api[0], HeroDataDTO[].class);
@@ -105,10 +104,9 @@ public class OpenDotaRestServiceImpl implements OpenDotaRestService {
             element.setCsPerMinEfficiency(element.getLast_hits(), element.getDuration());
             element.setHeroDmgEfficiency(element.getHero_damage(), element.getDuration());
             element.setTowerDmgEfficiency(element.getTower_damage(), element.getDuration());
-            //if player won match as radiant
             if(element.radiant_win && element.getPlayer_slot() <= 127){
                 totalWins += 1;
-            }//else if player won match as dire
+            }
             else if(!element.radiant_win && element.getPlayer_slot() >= 128){
                 //might implement something like radiant-dire win ratio or something similar in the future
                 totalWins += 1;
@@ -122,6 +120,7 @@ public class OpenDotaRestServiceImpl implements OpenDotaRestService {
             sumTowerDamage += element.getTower_damage();
             sumLastHits += element.getLast_hits();
             sumDuration += element.getDuration();
+            System.out.println("KDA: " + element.getKdaRatio());
 
         }
         System.out.println("total wins: " + totalWins);
@@ -135,11 +134,6 @@ public class OpenDotaRestServiceImpl implements OpenDotaRestService {
         avgLastHit = (float) sumLastHits  / recentMatchesDTOList.length;
         avgLastHitPerMinute = (float) sumLastHits / ((float)sumDuration / 60);
 
-        System.out.println("win rate: " + winRate + "\naverage KDA: " +
-                avgKDA + "\naverage GPM: " + avgGPM + "\naverage XPM: " + avgXPM + "\naverage LH: "
-                + avgLastHit + "\naverage LH per Min: " + avgLastHitPerMinute + "\navg Hero Dmg: " +
-                avgHeroDamage + "\nAvg Tower Dmg: " + avgTowerDamage
-        );
         Map<String, Object> matchMap = new HashMap<>();
         matchMap.put("match_aggregate",  new RecentMatchAggregateDTO(recentMatchesDTOList.length, winRate, avgKDA, avgGPM, avgXPM, avgHeroDamage, avgTowerDamage, avgLastHit, avgLastHitPerMinute));
         matchMap.put("match_list", recentMatchesDTOList);
