@@ -102,6 +102,7 @@ public class HeroStatsScheduler {
 
     public List<HeroesPlayedByUserDTO> heroesPlayedByUser(BigInteger user){
         //there might be race condition issue here. fix later if possible
+        //need to get the cache for all hero details from allHeroesStatsCache to get the img and localized_name
         CaffeineCache allHeroes = (CaffeineCache) this.cacheManager.getCache("allHeroesStatsCache");
         List<HeroesPlayedByUserDTO> heroesPlayedList = this.openDotaRestService.retrieveHeroesPlayed(user);
         System.out.println("heroesPlayedByUser called");
