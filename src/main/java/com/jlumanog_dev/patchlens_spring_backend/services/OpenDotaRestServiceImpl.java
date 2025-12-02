@@ -1,9 +1,6 @@
 package com.jlumanog_dev.patchlens_spring_backend.services;
 
-import com.jlumanog_dev.patchlens_spring_backend.dto.HeroDataDTO;
-import com.jlumanog_dev.patchlens_spring_backend.dto.HeroesPlayedByUserDTO;
-import com.jlumanog_dev.patchlens_spring_backend.dto.RecentMatchAggregateDTO;
-import com.jlumanog_dev.patchlens_spring_backend.dto.RecentMatchesDTO;
+import com.jlumanog_dev.patchlens_spring_backend.dto.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
@@ -13,7 +10,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.math.BigInteger;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 //This service class is dedicated to retrieving game data from OpenDota API
 // and persisting it into all relevant database table
@@ -26,7 +23,7 @@ public class OpenDotaRestServiceImpl implements OpenDotaRestService {
             "https://api.opendota.com/api/heroStats",
             "https://api.opendota.com/api/players/"
     };
-    private String[] apiQueryParams = { "/recentMatches?game_mode=22" };
+    private String[] apiQueryParams = { "/recentMatches?game_mode=22", "/matches?game_mode=22&limit=20" };
 
 
     @Autowired
@@ -48,16 +45,29 @@ public class OpenDotaRestServiceImpl implements OpenDotaRestService {
     }
 
     @Override
-    public List<HeroesPlayedByUserDTO> retrieveHeroesPlayed(BigInteger steamId){
-        List<HeroesPlayedByUserDTO> heroesPlayedList;
+    public Map<String, Object> retrieveHeroesPlayed(BigInteger steamId){
+        List<MatchRankedDTO> matchesList;
+        Map<Integer, Long> frequencyMatchObjects; // this Map contains the frequency of heroId <hero ID, frequency>
+        List<MatchRankedDTO> sortedMatches;
+        Map<String, Object> responseObject = new HashMap<>();
         try{
-            HeroesPlayedByUserDTO[] heroesPlayedArray = this.dotaRestTemplate.getForObject(this.api[1] + steamId.toString() + "/heroes", HeroesPlayedByUserDTO[].class);
+            MatchRankedDTO[] heroesPlayedArray = this.dotaRestTemplate.getForObject(this.api[1] + steamId.toString() + this.apiQueryParams[1], MatchRankedDTO[].class);
             assert heroesPlayedArray != null;
-            heroesPlayedList = Arrays.asList(heroesPlayedArray);
+            matchesList = Arrays.asList(heroesPlayedArray);
+            //need to create a separate map containing <hero_id, frequency of objects with this hero_id>
+            //then sort the list using the map object
+            frequencyMatchObjects = matchesList.stream().collect(Collectors.groupingBy(MatchRankedDTO::getHero_id, Collectors.counting()));
+            responseObject.put("frequencyHeroes", frequencyMatchObjects);
+            responseObject.put("recentMatches", matchesList);
+            //May not need this sorted list - it basically sorts the list of matches in order by hero_id frequency
+/*            sortedMatches = matchesList.stream().sorted((hero1, hero2) -> Long.compare(
+                    frequencyMatchObjects.get(hero2.getHero_id()), frequencyMatchObjects.get((hero1.getHero_id()))
+                    )).toList();*/
+
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        return heroesPlayedList;
+        return responseObject;
     }
 
     @Override

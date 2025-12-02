@@ -3,6 +3,7 @@ package com.jlumanog_dev.patchlens_spring_backend.scheduler;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.jlumanog_dev.patchlens_spring_backend.dto.HeroDataDTO;
 import com.jlumanog_dev.patchlens_spring_backend.dto.HeroesPlayedByUserDTO;
+import com.jlumanog_dev.patchlens_spring_backend.dto.MatchRankedDTO;
 import com.jlumanog_dev.patchlens_spring_backend.dto.RecentMatchesDTO;
 import com.jlumanog_dev.patchlens_spring_backend.services.OpenDotaRestService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,10 +16,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;
 import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.IntStream;
 
 @Component
@@ -100,11 +98,11 @@ public class HeroStatsScheduler {
     }
 
 
-    public List<HeroesPlayedByUserDTO> heroesPlayedByUser(BigInteger user){
+    public Map<String, Object> heroesPlayedByUser(BigInteger user){
         //there might be race condition issue here. fix later if possible
         //need to get the cache for all hero details from allHeroesStatsCache to get the img and localized_name
         CaffeineCache allHeroes = (CaffeineCache) this.cacheManager.getCache("allHeroesStatsCache");
-        List<HeroesPlayedByUserDTO> heroesPlayedList = this.openDotaRestService.retrieveHeroesPlayed(user);
+        Map<String, Object> heroesPlayedList = this.openDotaRestService.retrieveHeroesPlayed(user);
         System.out.println("heroesPlayedByUser called");
         assert allHeroes != null;
         Cache<Object, Object> allHeroesNativeCache = allHeroes.getNativeCache();
@@ -112,7 +110,7 @@ public class HeroStatsScheduler {
         /* Since I'm not using Entity relationships and JPA advance mapping:
         Need to retrieve the allHeroes cache and filter out which item matches heroes' ID from
         heroesPlayedList so that I can assign the correct localized_name & img, and probably a few more*/
-        for (HeroesPlayedByUserDTO element : heroesPlayedList){
+        for (MatchRankedDTO element : (List<MatchRankedDTO>) heroesPlayedList.get("recentMatches")){
             /*Reinder that the 'value' is a list of type HeroesPlayedByUserDTO itself, check the sout output and see.
             The allHeroesNativeCache  is converted to a Map collection that contains only 1 value (allHeroesStatsCache)
             to use the forEach method and access the actual value needed through 'value' object parameter.*/
@@ -126,8 +124,6 @@ public class HeroStatsScheduler {
                 element.setLocalized_name(heroItem.get().getLocalized_name());
             });
         }
-
-
         return heroesPlayedList;
     }
 

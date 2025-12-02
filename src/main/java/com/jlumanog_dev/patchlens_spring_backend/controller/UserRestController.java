@@ -1,9 +1,6 @@
 package com.jlumanog_dev.patchlens_spring_backend.controller;
 
-import com.jlumanog_dev.patchlens_spring_backend.dto.HeroDataDTO;
-import com.jlumanog_dev.patchlens_spring_backend.dto.HeroesPlayedByUserDTO;
-import com.jlumanog_dev.patchlens_spring_backend.dto.RecentMatchAggregateDTO;
-import com.jlumanog_dev.patchlens_spring_backend.dto.UserDTO;
+import com.jlumanog_dev.patchlens_spring_backend.dto.*;
 import com.jlumanog_dev.patchlens_spring_backend.entity.User;
 import com.jlumanog_dev.patchlens_spring_backend.exception.AuthenticationErrorException;
 import com.jlumanog_dev.patchlens_spring_backend.scheduler.HeroStatsScheduler;
@@ -109,12 +106,12 @@ public class UserRestController {
     }
 
     @GetMapping("/user/heroes")
-    public ResponseEntity<List<HeroesPlayedByUserDTO>> retrieveHeroesPlayedByUser(){
+    public ResponseEntity<Map<String, Object>> retrieveHeroesPlayedByUser(){
         Authentication authUser = SecurityContextHolder.getContext().getAuthentication();
         UserDetails userDetails = (UserDetails) authUser.getPrincipal();
         User user = this.userService.findByUsername(userDetails.getUsername());
-        List<HeroesPlayedByUserDTO> playedByUserDTO = this.heroStatsScheduler.heroesPlayedByUser(user.getSteamId());
-        this.openDotaRestService.retrieveRecentMatches(user.getSteamId());
+        Map<String, Object>playedByUserDTO = this.heroStatsScheduler.heroesPlayedByUser(user.getSteamId());
+
         return ResponseEntity.ok(playedByUserDTO);
     }
 
