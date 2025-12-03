@@ -6,7 +6,7 @@ public class RecentMatchAggregateDTO {
     //Private fields with getters will  private fields to JSON
     public int totalMatches;
     public float winRate;
-    public float avgKDA;
+    public float cumulativeKDA;
     public float avgGPM;
     public float avgXPM;
     public float avgHeroDamage;
@@ -16,10 +16,10 @@ public class RecentMatchAggregateDTO {
 
 
 
-    public RecentMatchAggregateDTO(int totalMatches, float winRate, float avgKDA, float avgGPM, float avgXPM, float avgHeroDamage, float avgTowerDamage, float avgLastHit, float avgLastHitPerMinute) {
+    public RecentMatchAggregateDTO(int totalMatches, float winRate, float cumulativeKDA, float avgGPM, float avgXPM, float avgHeroDamage, float avgTowerDamage, float avgLastHit, float avgLastHitPerMinute) {
         this.totalMatches = totalMatches;
         this.winRate = winRate;
-        this.avgKDA = avgKDA;
+        this.cumulativeKDA = cumulativeKDA;
         this.avgGPM = avgGPM;
         this.avgXPM = avgXPM;
         this.avgHeroDamage = avgHeroDamage;

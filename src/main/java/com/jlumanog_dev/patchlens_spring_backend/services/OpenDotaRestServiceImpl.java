@@ -93,7 +93,7 @@ public class OpenDotaRestServiceImpl implements OpenDotaRestService {
         RecentMatchesDTO[] recentMatchesDTOList = this.dotaRestTemplate.getForObject(this.api[1] + steamId.toString() + this.apiQueryParams[0], RecentMatchesDTO[].class);
         //aggregate fields
         float winRate;
-        float avgKDA;
+        float cumulativeKDA;
         float avgGPM;
         float avgXPM;
         float avgHeroDamage;
@@ -141,7 +141,7 @@ public class OpenDotaRestServiceImpl implements OpenDotaRestService {
         }
         System.out.println("total wins: " + totalWins);
         winRate = 100 * ((float) totalWins / recentMatchesDTOList.length);
-        avgKDA = (float) (sumKills + sumAssists) / Math.max(1, sumDeaths);
+        cumulativeKDA = (float) (sumKills + sumAssists) / Math.max(1, sumDeaths);
         avgGPM = (float) sumGPM / recentMatchesDTOList.length;
         avgXPM = (float) sumXPM / recentMatchesDTOList.length;
         avgHeroDamage = (float) sumHeroDamage / recentMatchesDTOList.length;
@@ -151,7 +151,7 @@ public class OpenDotaRestServiceImpl implements OpenDotaRestService {
         avgLastHitPerMinute = (float) sumLastHits / ((float)sumDuration / 60);
 
         Map<String, Object> matchMap = new HashMap<>();
-        matchMap.put("match_aggregate",  new RecentMatchAggregateDTO(recentMatchesDTOList.length, winRate, avgKDA, avgGPM, avgXPM, avgHeroDamage, avgTowerDamage, avgLastHit, avgLastHitPerMinute));
+        matchMap.put("match_aggregate",  new RecentMatchAggregateDTO(recentMatchesDTOList.length, winRate, cumulativeKDA, avgGPM, avgXPM, avgHeroDamage, avgTowerDamage, avgLastHit, avgLastHitPerMinute));
         matchMap.put("match_list", recentMatchesDTOList);
         return matchMap;
 
