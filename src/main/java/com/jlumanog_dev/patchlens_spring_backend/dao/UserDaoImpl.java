@@ -14,12 +14,21 @@ public class UserDaoImpl implements UserDao {
     public UserDaoImpl(EntityManager entityManager){
         this.entityManager = entityManager;
     }
-    public User findByUsername(Object username){
-        TypedQuery<User> query = this.entityManager.createQuery("FROM User where username=:data", User.class);
-        query.setParameter("data", username);
+    @Override
+    public User findByPin(Object shaPin){
+        TypedQuery<User> query = this.entityManager.createQuery("FROM User where shaLookup=:data", User.class);
+        query.setParameter("data", shaPin);
         return query.getSingleResult();
     }
     public void save(User users){
         this.entityManager.persist(users);
     }
+
+    @Override
+    public User findByPersona(String persona){
+        TypedQuery<User> query = this.entityManager.createQuery("FROM User where personaName=:persona", User.class);
+        query.setParameter("persona", persona);
+        return query.getSingleResult();
+    }
+
 }

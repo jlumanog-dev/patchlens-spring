@@ -21,10 +21,12 @@ public class UserServiceImplementation implements UserService{
         this.userDao.save(users);
     }
     @Override
-    public User findByUsername(Object username){
-        User user = this.userDao.findByUsername(username);
-        return user;
+    public User findByPin(Object shaPin){
+        return this.userDao.findByPin(shaPin);
     }
-
+    @Override
+    public User findByPersona(String persona){
+        return this.userDao.findByPersona(persona);
+    }
 
 }

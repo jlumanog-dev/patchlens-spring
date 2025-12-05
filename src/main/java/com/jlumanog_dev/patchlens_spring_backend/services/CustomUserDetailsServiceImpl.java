@@ -20,7 +20,10 @@ Note: the bean/instance for this is used on JwtAuthenticationFilter to retrieve 
 as UserDetails type used to compare it to JWT to determine if the token is valid with the correct role.
 
 */
-@Service
+
+
+
+/*@Service
 public class CustomUserDetailsServiceImpl implements UserDetailsService {
     private UserService userService;
 
@@ -40,4 +43,4 @@ public class CustomUserDetailsServiceImpl implements UserDetailsService {
         List<? extends GrantedAuthority> authority = List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole()));
         return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), authority);
     }
-}
+}*/

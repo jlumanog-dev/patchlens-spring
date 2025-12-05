@@ -11,26 +11,34 @@ public class User {
     @Column(name="id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-
-
-    @Column(name = "username")
-    private String username;
+    @Column(name="username")
+    private String personaName;
     @Column(name = "email")
     private String email;
-    @Column(name = "password_hash")
-    private String password;
+    @Column(name = "pin_hash")
+    private String pinField;
+    @Column(name="sha_lookup")
+    private String shaLookup;
     @Column(name = "role")
     private String role;
+    @Column(name="player_id")
+    private BigInteger playerIdField;
 
-    @Column(name="steam_id")
-    private BigInteger steamId;
 
-    public BigInteger getSteamId() {
-        return steamId;
+    public String getShaLookup() {
+        return shaLookup;
     }
 
-    public void setSteamId(BigInteger steamId) {
-        this.steamId = steamId;
+    public void setShaLookup(String shaLookup) {
+        this.shaLookup = shaLookup;
+    }
+
+    public BigInteger getPlayerField() {
+        return playerIdField;
+    }
+
+    public void setPlayerIdField(BigInteger getPlayerId) {
+        this.playerIdField = getPlayerId;
     }
 
     public String getRole() {
@@ -40,28 +48,21 @@ public class User {
         this.role = role;
     }
 
-    public String getPassword(){
-        return this.password;
+    public String getPinField() {
+        return pinField;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setPinField(String pin) {
+        this.pinField = pin;
     }
 
-    public String getUsername() {
-        return username;
+    public String getPersonaName() {
+        return personaName;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setPersonaName(String username) {
+        this.personaName = username;
     }
 
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
     public User(){}
 }

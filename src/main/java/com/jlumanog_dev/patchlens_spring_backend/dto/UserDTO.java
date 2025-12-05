@@ -5,24 +5,25 @@ import jakarta.persistence.Column;
 import java.math.BigInteger;
 
 public class UserDTO {
-    private String username;
+    private String personaName;
     private String email;
-    private BigInteger steamId;
+    private String role;
+    private BigInteger playerIdField;
 
-    public BigInteger getSteamId() {
-        return steamId;
+    public BigInteger getPlayerIdField() {
+        return playerIdField;
     }
 
-    public void setSteamId(BigInteger steamId) {
-        this.steamId = steamId;
+    public void setPlayerIdField(BigInteger playerIdField) {
+        this.playerIdField = playerIdField;
     }
 
-    public String getUsername() {
-        return username;
+    public String getPersonaName() {
+        return personaName;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setPersonaName(String personaName) {
+        this.personaName = personaName;
     }
 
     public String getEmail() {
@@ -31,5 +32,13 @@ public class UserDTO {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 }
