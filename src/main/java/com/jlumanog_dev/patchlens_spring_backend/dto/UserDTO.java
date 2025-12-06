@@ -9,7 +9,10 @@ public class UserDTO {
     private String email;
     private String role;
     private BigInteger playerIdField;
-
+    @Override
+    public String toString(){
+        return "persona: " + this.getPersonaName() + "\nplayerIdField: " + this.getPlayerIdField() + "\nrole: " + this.getRole();
+    }
     public BigInteger getPlayerIdField() {
         return playerIdField;
     }

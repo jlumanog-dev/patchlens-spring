@@ -21,7 +21,7 @@ public class User {
     private String shaLookup;
     @Column(name = "role")
     private String role;
-    @Column(name="player_id")
+    @Column(name = "player_id")
     private BigInteger playerIdField;
 
 
@@ -33,7 +33,7 @@ public class User {
         this.shaLookup = shaLookup;
     }
 
-    public BigInteger getPlayerField() {
+    public BigInteger getPlayerIdField() {
         return playerIdField;
     }
 

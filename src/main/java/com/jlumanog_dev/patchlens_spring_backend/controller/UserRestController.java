@@ -59,7 +59,7 @@ public class UserRestController {
     public ResponseEntity<Map<String, Object>> register(@RequestBody User payloadUser){
         String temp = payloadUser.getPinField();
 
-        String usernameGenerate = payloadUser.getPersonaName() + "_" + payloadUser.getPlayerField();
+        String usernameGenerate = payloadUser.getPersonaName() + "_" + payloadUser.getPlayerIdField();
         payloadUser.setPersonaName(usernameGenerate);
 
         Object encodedPin = this.delegatingPasswordEncoder.encode(payloadUser.getPinField());
@@ -110,14 +110,20 @@ public class UserRestController {
     @GetMapping("/user")
     public ResponseEntity<UserDTO> getUserData(){
         Authentication authUser = SecurityContextHolder.getContext().getAuthentication();
+        System.out.println("principal here - user data");
+        System.out.println(authUser.getPrincipal());
         UserDTO user = this.modelMapper.map(authUser.getPrincipal(), UserDTO.class);
+        System.out.println(user.getPlayerIdField());
         return ResponseEntity.ok(user);
     }
 
     @GetMapping("/user/heroes")
     public ResponseEntity<Map<String, Object>> retrieveHeroesPlayedByUser(){
         Authentication authUser = SecurityContextHolder.getContext().getAuthentication();
+        System.out.println("principal here - heroesplayed");
+        System.out.println(authUser.getPrincipal());
         UserDTO user = this.modelMapper.map(authUser.getPrincipal(), UserDTO.class);
+        System.out.println(user.getPlayerIdField());
         Map<String, Object>playedByUserDTO = this.heroStatsScheduler.heroesPlayedByUser(user.getPlayerIdField());
 
         return ResponseEntity.ok(playedByUserDTO);
@@ -126,8 +132,11 @@ public class UserRestController {
     @GetMapping("/user/recentMatches")
     public ResponseEntity<Map<String, Object>> retrieveRecentMatches(){
         Authentication authUser = SecurityContextHolder.getContext().getAuthentication();
+        System.out.println("principal here - recentmatch:");
+        System.out.println(authUser.getPrincipal());
         //might add try catch here or some kind of exception handling
-        UserDTO userDTO = this.modelMapper.map(authUser.getPrincipal(), UserDTO.class); // seems unnecessary, just making sure I'm using user object with no password field - might change later
-        return ResponseEntity.ok(this.openDotaRestService.retrieveRecentMatches(userDTO.getPlayerIdField()));
+        UserDTO user = this.modelMapper.map(authUser.getPrincipal(), UserDTO.class); // seems unnecessary, just making sure I'm using user object with no password field - might change later
+        System.out.println(user.getPlayerIdField());
+        return ResponseEntity.ok(this.openDotaRestService.retrieveRecentMatches(user.getPlayerIdField()));
     }
 }
