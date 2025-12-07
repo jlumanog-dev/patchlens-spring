@@ -9,6 +9,7 @@ import com.jlumanog_dev.patchlens_spring_backend.exception.AuthenticationErrorEx
 import com.jlumanog_dev.patchlens_spring_backend.scheduler.HeroStatsScheduler;
 import com.jlumanog_dev.patchlens_spring_backend.services.OpenDotaRestService;
 import com.jlumanog_dev.patchlens_spring_backend.services.UserService;
+import jakarta.persistence.NoResultException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -57,6 +58,19 @@ public class UserRestController {
 
     @PostMapping("/register")
     public ResponseEntity<Map<String, Object>> register(@RequestBody User payloadUser){
+        //NOTE that SHA256 produces same hash to same raw input
+        String shaEncoded = SHAUtility.shaHash(payloadUser.getPinField());
+        boolean doesUserExists = false;
+        User userTemp = this.userService.findByPin(shaEncoded);
+        if(userTemp != null){
+            System.out.println(userTemp.getShaLookup());
+            System.out.println("shaEncoded: " + shaEncoded);
+            Map<String, Object> tempResponse = new HashMap<>();
+            tempResponse.put("MESSAGE", "User/PIN already exists");
+            tempResponse.put("doesUserExists", true);
+            return ResponseEntity.ok(tempResponse);
+        }
+
         String temp = payloadUser.getPinField();
 
         String usernameGenerate = payloadUser.getPersonaName() + "_" + payloadUser.getPlayerIdField();
@@ -64,7 +78,6 @@ public class UserRestController {
 
         Object encodedPin = this.delegatingPasswordEncoder.encode(payloadUser.getPinField());
         String finalEncodedValue =  encodedPin.toString();
-        String shaEncoded = SHAUtility.shaHash(payloadUser.getPinField());
         payloadUser.setPinField(finalEncodedValue);
         payloadUser.setShaLookup(shaEncoded);
         payloadUser.setRole("USER");
