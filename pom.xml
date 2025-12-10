@@ -96,6 +96,12 @@
 			<artifactId>modelmapper</artifactId>
 			<version>3.2.4</version>
 		</dependency>
+		<dependency>
+			<groupId>com.anthropic</groupId>
+			<artifactId>anthropic-java</artifactId>
+			<version>2.11.1</version>
+		</dependency>
+
 	</dependencies>
 
 	<build>

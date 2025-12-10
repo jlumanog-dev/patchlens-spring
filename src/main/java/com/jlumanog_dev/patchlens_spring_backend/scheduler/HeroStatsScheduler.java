@@ -92,7 +92,7 @@ public class HeroStatsScheduler {
 
         //sorting the list into descending order based on disparity score and pub win rate respectively (pro-to-pub)
         heroesList.sort(Comparator.comparing(HeroDataDTO::getDisparityScore).thenComparing(HeroDataDTO::getWinRate).reversed());
-        List<HeroDataDTO> topHeroes = heroesList.stream().limit(5).toList();
+        List<HeroDataDTO> topHeroes = heroesList.stream().limit(3).toList();
         System.out.println("topHeroStatsRefresh has been called");
         return topHeroes;
     }

@@ -1,5 +1,9 @@
 package com.jlumanog_dev.patchlens_spring_backend.controller;
 
+import com.anthropic.client.AnthropicClient;
+import com.anthropic.models.messages.Message;
+import com.anthropic.models.messages.MessageCreateParams;
+import com.anthropic.models.messages.Model;
 import com.jlumanog_dev.patchlens_spring_backend.custom_auth.JwtService;
 import com.jlumanog_dev.patchlens_spring_backend.custom_auth.PinAuthenticationToken;
 import com.jlumanog_dev.patchlens_spring_backend.custom_auth.SHAUtility;
@@ -9,20 +13,16 @@ import com.jlumanog_dev.patchlens_spring_backend.exception.AuthenticationErrorEx
 import com.jlumanog_dev.patchlens_spring_backend.scheduler.HeroStatsScheduler;
 import com.jlumanog_dev.patchlens_spring_backend.services.OpenDotaRestService;
 import com.jlumanog_dev.patchlens_spring_backend.services.UserService;
-import jakarta.persistence.NoResultException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.Security;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,6 +37,7 @@ public class UserRestController {
     private OpenDotaRestService openDotaRestService;
     private AuthenticationManager authenticationManager;
     private JwtService jwtService;
+    private AnthropicClient anthropicClient;
 
     @Autowired
     public UserRestController( OpenDotaRestService openDotaRestService,
@@ -46,7 +47,8 @@ public class UserRestController {
                                DelegatingPasswordEncoder delegatingPasswordEncoder,
                                HeroStatsScheduler heroStatsScheduler,
                                AuthenticationManager authenticationManager,
-                               JwtService jwtService){
+                               JwtService jwtService,
+                               AnthropicClient anthropicClient){
         this.userService = userService;
         this.delegatingPasswordEncoder = delegatingPasswordEncoder;
         this.modelMapper = modelMapper;
@@ -54,6 +56,7 @@ public class UserRestController {
         this.openDotaRestService = openDotaRestService;
         this.authenticationManager = authenticationManager;
         this.jwtService = jwtService;
+        this.anthropicClient = anthropicClient;
     }
 
     @PostMapping("/register")
@@ -63,8 +66,6 @@ public class UserRestController {
         boolean doesUserExists = false;
         User userTemp = this.userService.findByPin(shaEncoded);
         if(userTemp != null){
-            System.out.println(userTemp.getShaLookup());
-            System.out.println("shaEncoded: " + shaEncoded);
             Map<String, Object> tempResponse = new HashMap<>();
             tempResponse.put("MESSAGE", "User/PIN already exists");
             tempResponse.put("doesUserExists", true);
@@ -88,10 +89,7 @@ public class UserRestController {
             System.out.println("AUTHENTICATING");
             Authentication authResult = this.authenticationManager.authenticate(new PinAuthenticationToken(temp));
             UserDTO user = this.modelMapper.map(authResult.getPrincipal(), UserDTO.class);
-            System.out.println("PERSONA");
-            System.out.println(user.getPersonaName());
             String token = this.jwtService.generateToken(user);
-            System.out.println("TOKEN: " + token);
             response.put("TOKEN", token);
 
             SecurityContextHolder.getContext().setAuthentication(authResult);
@@ -123,8 +121,6 @@ public class UserRestController {
     @GetMapping("/user")
     public ResponseEntity<UserDTO> getUserData(){
         Authentication authUser = SecurityContextHolder.getContext().getAuthentication();
-        System.out.println("principal here - user data");
-        System.out.println(authUser.getPrincipal());
         UserDTO user = this.modelMapper.map(authUser.getPrincipal(), UserDTO.class);
         System.out.println(user.getPlayerIdField());
         return ResponseEntity.ok(user);
@@ -133,8 +129,6 @@ public class UserRestController {
     @GetMapping("/user/heroes")
     public ResponseEntity<Map<String, Object>> retrieveHeroesPlayedByUser(){
         Authentication authUser = SecurityContextHolder.getContext().getAuthentication();
-        System.out.println("principal here - heroesplayed");
-        System.out.println(authUser.getPrincipal());
         UserDTO user = this.modelMapper.map(authUser.getPrincipal(), UserDTO.class);
         System.out.println(user.getPlayerIdField());
         Map<String, Object>playedByUserDTO = this.heroStatsScheduler.heroesPlayedByUser(user.getPlayerIdField());
@@ -145,8 +139,10 @@ public class UserRestController {
     @GetMapping("/user/recentMatches")
     public ResponseEntity<Map<String, Object>> retrieveRecentMatches(){
         Authentication authUser = SecurityContextHolder.getContext().getAuthentication();
-        System.out.println("principal here - recentmatch:");
-        System.out.println(authUser.getPrincipal());
+        MessageCreateParams params = MessageCreateParams.builder().maxTokens(1024L).addUserMessage("Hi Claude").model(Model.CLAUDE_SONNET_4_5_20250929).build();
+        Message message = this.anthropicClient.messages().create(params);
+        System.out.println(message);
+
         //might add try catch here or some kind of exception handling
         UserDTO user = this.modelMapper.map(authUser.getPrincipal(), UserDTO.class); // seems unnecessary, just making sure I'm using user object with no password field - might change later
         System.out.println(user.getPlayerIdField());
