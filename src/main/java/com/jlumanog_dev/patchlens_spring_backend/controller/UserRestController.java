@@ -9,6 +9,7 @@ import com.jlumanog_dev.patchlens_spring_backend.custom_auth.PinAuthenticationTo
 import com.jlumanog_dev.patchlens_spring_backend.custom_auth.SHAUtility;
 import com.jlumanog_dev.patchlens_spring_backend.dto.*;
 import com.jlumanog_dev.patchlens_spring_backend.entity.User;
+import com.jlumanog_dev.patchlens_spring_backend.entity.UserInsight;
 import com.jlumanog_dev.patchlens_spring_backend.exception.AuthenticationErrorException;
 import com.jlumanog_dev.patchlens_spring_backend.scheduler.HeroStatsScheduler;
 import com.jlumanog_dev.patchlens_spring_backend.services.OpenDotaRestService;
@@ -73,20 +74,20 @@ public class UserRestController {
         }
 
         String temp = payloadUser.getPinField();
-
         String usernameGenerate = payloadUser.getPersonaName() + "_" + payloadUser.getPlayerIdField();
         payloadUser.setPersonaName(usernameGenerate);
 
         Object encodedPin = this.delegatingPasswordEncoder.encode(payloadUser.getPinField());
         String finalEncodedValue =  encodedPin.toString();
+        UserInsight tempInsight = new UserInsight("no player insight at the moment");
         payloadUser.setPinField(finalEncodedValue);
         payloadUser.setShaLookup(shaEncoded);
         payloadUser.setRole("USER");
+        payloadUser.setUser_insight(tempInsight);
         this.userService.save(payloadUser);
         Map<String, Object> response = new HashMap<>();
 
         try{
-            System.out.println("AUTHENTICATING");
             Authentication authResult = this.authenticationManager.authenticate(new PinAuthenticationToken(temp));
             UserDTO user = this.modelMapper.map(authResult.getPrincipal(), UserDTO.class);
             String token = this.jwtService.generateToken(user);
@@ -110,7 +111,6 @@ public class UserRestController {
             String token = this.jwtService.generateToken(user);
             response.put("TOKEN", token);
             SecurityContextHolder.getContext().setAuthentication(authResult); // must manually set authenticate user to SecurityContextHolder when using custom auth provider
-            System.out.println(SecurityContextHolder.getContext().getAuthentication());
             return ResponseEntity.ok(response);
         }catch (Exception e){
             throw new AuthenticationErrorException("Invalid credentials - occurred in /login");
@@ -122,7 +122,6 @@ public class UserRestController {
     public ResponseEntity<UserDTO> getUserData(){
         Authentication authUser = SecurityContextHolder.getContext().getAuthentication();
         UserDTO user = this.modelMapper.map(authUser.getPrincipal(), UserDTO.class);
-        System.out.println(user.getPlayerIdField());
         return ResponseEntity.ok(user);
     }
 
@@ -139,9 +138,9 @@ public class UserRestController {
     @GetMapping("/user/recentMatches")
     public ResponseEntity<Map<String, Object>> retrieveRecentMatches(){
         Authentication authUser = SecurityContextHolder.getContext().getAuthentication();
-        MessageCreateParams params = MessageCreateParams.builder().maxTokens(1024L).addUserMessage("Hi Claude").model(Model.CLAUDE_SONNET_4_5_20250929).build();
-        Message message = this.anthropicClient.messages().create(params);
-        System.out.println(message);
+        //MessageCreateParams params = MessageCreateParams.builder().maxTokens(1024L).addUserMessage("Hi Claude").model(Model.CLAUDE_SONNET_4_5_20250929).build();
+       //Message message = this.anthropicClient.messages().create(params);
+        //System.out.println(message);
 
         //might add try catch here or some kind of exception handling
         UserDTO user = this.modelMapper.map(authUser.getPrincipal(), UserDTO.class); // seems unnecessary, just making sure I'm using user object with no password field - might change later

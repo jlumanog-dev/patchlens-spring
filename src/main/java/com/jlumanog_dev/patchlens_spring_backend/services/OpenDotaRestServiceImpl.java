@@ -136,10 +136,7 @@ public class OpenDotaRestServiceImpl implements OpenDotaRestService {
             sumTowerDamage += element.getTower_damage();
             sumLastHits += element.getLast_hits();
             sumDuration += element.getDuration();
-            System.out.println("KDA: " + element.getKdaRatio());
-
         }
-        System.out.println("total wins: " + totalWins);
         winRate = 100 * ((float) totalWins / recentMatchesDTOList.length);
         cumulativeKDA = (float) (sumKills + sumAssists) / Math.max(1, sumDeaths);
         avgGPM = (float) sumGPM / recentMatchesDTOList.length;

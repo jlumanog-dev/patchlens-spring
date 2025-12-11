@@ -24,6 +24,17 @@ public class User {
     @Column(name = "player_id")
     private BigInteger playerIdField;
 
+    @OneToOne(cascade = CascadeType.ALL, fetch=FetchType.LAZY)
+    @JoinColumn(name="user_insight_id")
+    private UserInsight user_insight;
+
+    public UserInsight getUser_insight() {
+        return user_insight;
+    }
+
+    public void setUser_insight(UserInsight user_insight) {
+        this.user_insight = user_insight;
+    }
 
     public String getShaLookup() {
         return shaLookup;
