@@ -44,7 +44,6 @@ public class HeroStatsScheduler {
     @Cacheable(value = "allHeroesStatsCache") // this annotation caches the return value and specifies the cache name
     public List<HeroDataDTO> allHeroesStatsRefresh() {
         List<HeroDataDTO> heroesList = this.openDotaRestService.retrieveAllHeroes();
-        System.out.println("allHeroesStatsCache");
         for (HeroDataDTO element : heroesList) {
             int totalPubWins = IntStream.of(element.getPub_win_trend()).sum();
             int totalPubPicks = IntStream.of(element.getPub_pick_trend()).sum();
@@ -70,7 +69,6 @@ public class HeroStatsScheduler {
             element.setTrendStdDev(trendStability);
             System.out.println(element.getImg());
         }
-        System.out.println("CALLED allHeroesStatsRefresh with images");
         return heroesList;
     }
 
@@ -110,7 +108,7 @@ public class HeroStatsScheduler {
         Need to retrieve the allHeroes cache and filter out which item matches heroes' ID from
         heroesPlayedList so that I can assign the correct localized_name & img, and probably a few more*/
         for (MatchRankedDTO element : (List<MatchRankedDTO>) heroesPlayedList.get("recentMatches")){
-            /*Reinder that the 'value' is a list of type HeroesPlayedByUserDTO itself, check the sout output and see.
+            /*Reminder that the 'value' is a list of type HeroesPlayedByUserDTO itself, check the sout output and see.
             The allHeroesNativeCache  is converted to a Map collection that contains only 1 value (allHeroesStatsCache)
             to use the forEach method and access the actual value needed through 'value' object parameter.*/
             allHeroesNativeCache.asMap().forEach((key, value) -> {

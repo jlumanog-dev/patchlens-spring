@@ -1,10 +1,13 @@
 package com.jlumanog_dev.patchlens_spring_backend.services;
 
 import com.jlumanog_dev.patchlens_spring_backend.dto.*;
+import org.hibernate.annotations.Cache;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.caffeine.CaffeineCache;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -86,11 +89,14 @@ public class OpenDotaRestServiceImpl implements OpenDotaRestService {
     }
 
     @Override
+    @Scheduled(fixedRate = 30 * 60 * 1000)
+    @Cacheable(value="recentMatchesCache")
     public Map<String, Object> retrieveRecentMatches(BigInteger steamId){
+        RecentMatchesDTO[] recentMatchesDTOList = this.dotaRestTemplate.getForObject(this.api[1] + steamId.toString() + this.apiQueryParams[0], RecentMatchesDTO[].class);
+
         CaffeineCache allHeroesCache = (CaffeineCache) this.cacheManager.getCache("allHeroesStatsCache");
         assert allHeroesCache != null;
         List<HeroDataDTO> allHeroes =  (List<HeroDataDTO>) allHeroesCache.getNativeCache().asMap().entrySet().iterator().next().getValue();
-        RecentMatchesDTO[] recentMatchesDTOList = this.dotaRestTemplate.getForObject(this.api[1] + steamId.toString() + this.apiQueryParams[0], RecentMatchesDTO[].class);
         //aggregate fields
         float winRate;
         float cumulativeKDA;
