@@ -156,8 +156,7 @@ public class UserRestController {
         CaffeineCache recentMatchesResultCache = (CaffeineCache) this.cacheManager.getCache("recentMatchesResultCache");
         CaffeineCache recentMatchCache = (CaffeineCache) this.cacheManager.getCache("recentMatchDataCache");
         assert recentMatchesResultCache != null && recentMatchCache != null;
-        Map<String, RecentMatchesDTO[]> recentMatchMap;
-
+        RecentMatchesDTO[] recentMatchMap;
         if(recentMatchCache.getNativeCache().estimatedSize() == 0){
             System.out.println("returning newly cached data");
             recentMatchMap = this.openDotaRestService.fetchRecentMatchWithCache(user.getPlayerIdField());
@@ -166,9 +165,26 @@ public class UserRestController {
         System.out.println("returning cached data (unchanged)");
         RecentMatchesDTO[] recentMatchesArray = this.dotaRestTemplate.getForObject("https://api.opendota.com/api/players/" + user.getPlayerIdField() + "/recentMatches?game_mode=22", RecentMatchesDTO[].class);
         //Map<String, Object> recentMatchesMap = (Map<String, Object>) recentMatchesResultCache.getNativeCache().asMap().entrySet().iterator().next().getValue();
-        assert  recentMatchesArray != null;
-        System.out.println(recentMatchesArray[0].getXp_per_min());
-        /*System.out.println(recentMatchesMap.);*/
+        assert recentMatchesArray != null;
+
+        recentMatchCache.getNativeCache().asMap().forEach((key, value) -> {
+            RecentMatchesDTO[] matches = (RecentMatchesDTO[]) value;
+            int iterate = 0;
+            for (RecentMatchesDTO element : matches){
+                System.out.println(element);
+                if(element.getMatch_id() != recentMatchesArray[iterate].getMatch_id()){
+                    recentMatchCache.evict(key);
+                    recentMatchesResultCache.evict(key);
+                    break;
+                }
+                iterate++;
+            }
+        });
+        if(recentMatchesResultCache.getNativeCache().estimatedSize() == 0){
+            System.out.println("returning newly cached data after recent match from OpenDota API updated");
+            return ResponseEntity.ok(this.openDotaRestService.retrieveRecentMatches(user.getPlayerIdField(), this.openDotaRestService.fetchRecentMatchWithCache(user.getPlayerIdField())));
+        }
+        System.out.println("returning old cache since no new recent match from player");
         return ResponseEntity.ok((Map<String, Object>) recentMatchesResultCache.getNativeCache().asMap().entrySet().iterator().next().getValue());
     }
 

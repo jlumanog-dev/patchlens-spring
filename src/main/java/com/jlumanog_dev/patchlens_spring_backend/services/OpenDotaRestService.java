@@ -13,6 +13,6 @@ public interface OpenDotaRestService {
     public List<HeroDataDTO> retrieveAllHeroes();
     public  Map<String, Object>  retrieveHeroesPlayed(BigInteger steamId);
     public HeroDataDTO retrieveHero(int heroId);
-    public Map<String, Object> retrieveRecentMatches(BigInteger steamId,  Map<String, RecentMatchesDTO[]> recentMatchMap);
-    public Map<String, RecentMatchesDTO[]> fetchRecentMatchWithCache(BigInteger steamId);
+    public Map<String, Object> retrieveRecentMatches(BigInteger steamId, RecentMatchesDTO[] recentMatchMap);
+    public RecentMatchesDTO[] fetchRecentMatchWithCache(BigInteger steamId);
 }

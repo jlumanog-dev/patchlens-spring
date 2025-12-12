@@ -37,6 +37,11 @@ public class RecentMatchesDTO {
         this.towerDmgEfficiency = towerDmgEfficiency;
     }*/
 
+    @Override
+    public String toString(){
+        return "Name: " + this.getLocalized_name() + "\nXPM: " + this.getXp_per_min() + "\nGPM: " + this.getGold_per_min() + "\nMATCH ID: " + this.getMatch_id();
+    }
+
     public String getLocalized_name() {
         return localized_name;
     }
