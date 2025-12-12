@@ -87,16 +87,25 @@ public class OpenDotaRestServiceImpl implements OpenDotaRestService {
         List<HeroDataDTO> allHeroesList = (List<HeroDataDTO>) allHeroesCache.getNativeCache().asMap().entrySet().iterator().next().getValue();
         return allHeroesList.stream().filter(element -> element.getId() == heroId).findFirst().get();
     }
-
-    @Override
-    @Scheduled(fixedRate = 30 * 60 * 1000)
-    @Cacheable(value="recentMatchesCache")
-    public Map<String, Object> retrieveRecentMatches(BigInteger steamId){
+    @Cacheable(value="recentMatchDataCache")
+    public Map<String, RecentMatchesDTO[]> fetchRecentMatchWithCache(BigInteger steamId){
+        Map<String, RecentMatchesDTO[]> response = new HashMap<>();
         RecentMatchesDTO[] recentMatchesDTOList = this.dotaRestTemplate.getForObject(this.api[1] + steamId.toString() + this.apiQueryParams[0], RecentMatchesDTO[].class);
 
+        System.out.println("new cache");
+        response.put("recentMatchObjectNew", recentMatchesDTOList);
+        return response;
+    }
+
+    @Override
+    @Cacheable(value="recentMatchesResultCache")
+    public Map<String, Object> retrieveRecentMatches(BigInteger steamId, Map<String, RecentMatchesDTO[]> recentMatchMap){
         CaffeineCache allHeroesCache = (CaffeineCache) this.cacheManager.getCache("allHeroesStatsCache");
         assert allHeroesCache != null;
+
         List<HeroDataDTO> allHeroes =  (List<HeroDataDTO>) allHeroesCache.getNativeCache().asMap().entrySet().iterator().next().getValue();
+
+        System.out.println("performing operation");
         //aggregate fields
         float winRate;
         float cumulativeKDA;
@@ -117,7 +126,7 @@ public class OpenDotaRestServiceImpl implements OpenDotaRestService {
         int sumLastHits = 0;
         int sumDuration = 0;
 
-        for(RecentMatchesDTO element : recentMatchesDTOList){
+        for(RecentMatchesDTO element : recentMatchMap.get("recentMatchObjectNew")){
             element.setKdaRatio(element.getKills(), element.getDeaths(), element.getAssists());
             element.setGpmXpmEfficiency(element.getGold_per_min(), element.getXp_per_min());
             element.setCsPerMinEfficiency(element.getLast_hits(), element.getDuration());
@@ -143,21 +152,20 @@ public class OpenDotaRestServiceImpl implements OpenDotaRestService {
             sumLastHits += element.getLast_hits();
             sumDuration += element.getDuration();
         }
-        winRate = 100 * ((float) totalWins / recentMatchesDTOList.length);
+        winRate = 100 * ((float) totalWins / recentMatchMap.get("recentMatchObjectNew").length);
         cumulativeKDA = (float) (sumKills + sumAssists) / Math.max(1, sumDeaths);
-        avgGPM = (float) sumGPM / recentMatchesDTOList.length;
-        avgXPM = (float) sumXPM / recentMatchesDTOList.length;
-        avgHeroDamage = (float) sumHeroDamage / recentMatchesDTOList.length;
-        avgTowerDamage = (float) sumTowerDamage / recentMatchesDTOList.length;
+        avgGPM = (float) sumGPM / recentMatchMap.get("recentMatchObjectNew").length;
+        avgXPM = (float) sumXPM / recentMatchMap.get("recentMatchObjectNew").length;
+        avgHeroDamage = (float) sumHeroDamage / recentMatchMap.get("recentMatchObjectNew").length;
+        avgTowerDamage = (float) sumTowerDamage / recentMatchMap.get("recentMatchObjectNew").length;
         //farm stats
-        avgLastHit = (float) sumLastHits  / recentMatchesDTOList.length;
+        avgLastHit = (float) sumLastHits  / recentMatchMap.get("recentMatchObjectNew").length;
         avgLastHitPerMinute = (float) sumLastHits / ((float)sumDuration / 60);
 
         Map<String, Object> matchMap = new HashMap<>();
-        matchMap.put("match_aggregate",  new RecentMatchAggregateDTO(recentMatchesDTOList.length, winRate, cumulativeKDA, avgGPM, avgXPM, avgHeroDamage, avgTowerDamage, avgLastHit, avgLastHitPerMinute));
-        matchMap.put("match_list", recentMatchesDTOList);
+        matchMap.put("match_aggregate",  new RecentMatchAggregateDTO(recentMatchMap.get("recentMatchObjectNew").length, winRate, cumulativeKDA, avgGPM, avgXPM, avgHeroDamage, avgTowerDamage, avgLastHit, avgLastHitPerMinute));
+        matchMap.put("match_list", recentMatchMap.get("recentMatchObjectNew"));
         return matchMap;
-
     }
 
 }

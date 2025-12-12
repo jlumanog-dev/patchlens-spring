@@ -2,6 +2,7 @@ package com.jlumanog_dev.patchlens_spring_backend.services;
 
 import com.jlumanog_dev.patchlens_spring_backend.dto.HeroDataDTO;
 import com.jlumanog_dev.patchlens_spring_backend.dto.MatchRankedDTO;
+import com.jlumanog_dev.patchlens_spring_backend.dto.RecentMatchesDTO;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -12,5 +13,6 @@ public interface OpenDotaRestService {
     public List<HeroDataDTO> retrieveAllHeroes();
     public  Map<String, Object>  retrieveHeroesPlayed(BigInteger steamId);
     public HeroDataDTO retrieveHero(int heroId);
-    public Map<String, Object> retrieveRecentMatches(BigInteger steamId);
+    public Map<String, Object> retrieveRecentMatches(BigInteger steamId,  Map<String, RecentMatchesDTO[]> recentMatchMap);
+    public Map<String, RecentMatchesDTO[]> fetchRecentMatchWithCache(BigInteger steamId);
 }

@@ -100,7 +100,6 @@ public class HeroStatsScheduler {
         //need to get the cache for all hero details from allHeroesStatsCache to get the img and localized_name
         CaffeineCache allHeroes = (CaffeineCache) this.cacheManager.getCache("allHeroesStatsCache");
         Map<String, Object> heroesPlayedList = this.openDotaRestService.retrieveHeroesPlayed(user);
-        System.out.println("heroesPlayedByUser called");
         assert allHeroes != null;
         Cache<Object, Object> allHeroesNativeCache = allHeroes.getNativeCache();
 

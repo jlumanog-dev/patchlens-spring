@@ -16,6 +16,8 @@ import com.jlumanog_dev.patchlens_spring_backend.services.OpenDotaRestService;
 import com.jlumanog_dev.patchlens_spring_backend.services.UserService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.caffeine.CaffeineCache;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
@@ -23,7 +25,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
+import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -39,6 +43,8 @@ public class UserRestController {
     private AuthenticationManager authenticationManager;
     private JwtService jwtService;
     private AnthropicClient anthropicClient;
+    private CacheManager cacheManager;
+    private RestTemplate dotaRestTemplate;
 
     @Autowired
     public UserRestController( OpenDotaRestService openDotaRestService,
@@ -49,7 +55,9 @@ public class UserRestController {
                                HeroStatsScheduler heroStatsScheduler,
                                AuthenticationManager authenticationManager,
                                JwtService jwtService,
-                               AnthropicClient anthropicClient){
+                               AnthropicClient anthropicClient,
+                               CacheManager cacheManager,
+                               RestTemplate dotaRestTemplate){
         this.userService = userService;
         this.delegatingPasswordEncoder = delegatingPasswordEncoder;
         this.modelMapper = modelMapper;
@@ -58,6 +66,8 @@ public class UserRestController {
         this.authenticationManager = authenticationManager;
         this.jwtService = jwtService;
         this.anthropicClient = anthropicClient;
+        this.cacheManager = cacheManager;
+        this.dotaRestTemplate = dotaRestTemplate;
     }
 
     @PostMapping("/register")
@@ -129,7 +139,6 @@ public class UserRestController {
     public ResponseEntity<Map<String, Object>> retrieveHeroesPlayedByUser(){
         Authentication authUser = SecurityContextHolder.getContext().getAuthentication();
         UserDTO user = this.modelMapper.map(authUser.getPrincipal(), UserDTO.class);
-        System.out.println(user.getPlayerIdField());
         Map<String, Object>playedByUserDTO = this.heroStatsScheduler.heroesPlayedByUser(user.getPlayerIdField());
 
         return ResponseEntity.ok(playedByUserDTO);
@@ -144,7 +153,23 @@ public class UserRestController {
 
         //might add try catch here or some kind of exception handling
         UserDTO user = this.modelMapper.map(authUser.getPrincipal(), UserDTO.class); // seems unnecessary, just making sure I'm using user object with no password field - might change later
-        System.out.println(user.getPlayerIdField());
-        return ResponseEntity.ok(this.openDotaRestService.retrieveRecentMatches(user.getPlayerIdField()));
+        CaffeineCache recentMatchesResultCache = (CaffeineCache) this.cacheManager.getCache("recentMatchesResultCache");
+        CaffeineCache recentMatchCache = (CaffeineCache) this.cacheManager.getCache("recentMatchDataCache");
+        assert recentMatchesResultCache != null && recentMatchCache != null;
+        Map<String, RecentMatchesDTO[]> recentMatchMap;
+
+        if(recentMatchCache.getNativeCache().estimatedSize() == 0){
+            System.out.println("returning newly cached data");
+            recentMatchMap = this.openDotaRestService.fetchRecentMatchWithCache(user.getPlayerIdField());
+            return ResponseEntity.ok(this.openDotaRestService.retrieveRecentMatches(user.getPlayerIdField(), recentMatchMap));
+        }
+        System.out.println("returning cached data (unchanged)");
+        RecentMatchesDTO[] recentMatchesArray = this.dotaRestTemplate.getForObject("https://api.opendota.com/api/players/" + user.getPlayerIdField() + "/recentMatches?game_mode=22", RecentMatchesDTO[].class);
+        //Map<String, Object> recentMatchesMap = (Map<String, Object>) recentMatchesResultCache.getNativeCache().asMap().entrySet().iterator().next().getValue();
+        assert  recentMatchesArray != null;
+        System.out.println(recentMatchesArray[0].getXp_per_min());
+        /*System.out.println(recentMatchesMap.);*/
+        return ResponseEntity.ok((Map<String, Object>) recentMatchesResultCache.getNativeCache().asMap().entrySet().iterator().next().getValue());
     }
+
 }

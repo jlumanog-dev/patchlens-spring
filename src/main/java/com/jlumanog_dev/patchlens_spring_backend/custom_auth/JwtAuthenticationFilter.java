@@ -55,12 +55,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         jwt = authHeader.substring(7);
         username = jwtService.extractPersona(jwt);
-        System.out.println("PERSONA: " + username);
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            System.out.println("inside jwtFilter:");
             UserDTO user = modelMapper.map(this.userService.findByPersona(username), UserDTO.class);
-            System.out.println(user);
             if (jwtService.isTokenValid(jwt, user)) {
                 List<GrantedAuthority> authority = List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole()));
                 PinAuthenticationToken authToken = new PinAuthenticationToken(user, authority);
