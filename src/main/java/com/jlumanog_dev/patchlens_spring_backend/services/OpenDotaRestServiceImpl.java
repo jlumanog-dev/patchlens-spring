@@ -170,21 +170,25 @@ public class OpenDotaRestServiceImpl implements OpenDotaRestService {
         avgLastHitPerMinute = (float) sumLastHits / ((float)sumDuration / 60);
 
         RecentMatchAggregateDTO temp = new RecentMatchAggregateDTO(recentMatchMap.length, winRate, cumulativeKDA, avgGPM, avgXPM, avgHeroDamage, avgTowerDamage, avgLastHit, avgLastHitPerMinute);
+
         Map<String, Object> heroesPlayedMap = this.heroesPlayedByUser(steamId);
         List<MatchRankedDTO> matchList = (List<MatchRankedDTO>) heroesPlayedMap.get("fixedSetMatches");
         Map<Integer, Long> heroFrequencyPerMatch = (Map<Integer, Long>) heroesPlayedMap.get("frequencyHeroes");
+        //REFACTOR-A:
+        //Might refactor this by creating a reusable method that gets the frequency of heroes from fixedSetMatches,
+        //get the top 3 most played heroes, calculate respective avg KDAs and return that to frontend
+        //instead of doing all that on client-side
         Map<Integer, Long> topThreeHeroesByFrequency = heroFrequencyPerMatch.entrySet().stream().sorted(Map.Entry.<Integer, Long>comparingByValue().reversed()).limit(3).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (a, b) -> a, LinkedHashMap::new));
-
-        //too lazy to create a dedicated POJO. Using generic object here instead.
         List<TopHeroComputedDTO> topHeroesWithComputedFields = new ArrayList<>();
-
         topThreeHeroesByFrequency.forEach((key, value) ->{
+            System.out.println(key + " " + value);
             String localized_name = "";
             float averageKills = 0;
             float averageDeaths = 0;
             float averageAssists = 0;
             int numberOfMatches = 0;
             String[] roles = {};
+            boolean isMatched = false;
             for(MatchRankedDTO item : matchList){
                 if(item.getHero_id() == key){
                     averageKills += item.kills;
@@ -193,12 +197,16 @@ public class OpenDotaRestServiceImpl implements OpenDotaRestService {
                     numberOfMatches++;
                     localized_name = item.getLocalized_name();
                     roles = item.getRoles();
+                    isMatched = true;
                 }
             }
-            averageKills /= numberOfMatches;
-            averageDeaths /= numberOfMatches;
-            averageAssists /= numberOfMatches;
-            topHeroesWithComputedFields.add(new TopHeroComputedDTO(localized_name, averageKills, averageDeaths, averageAssists, numberOfMatches, roles));
+            if(isMatched){
+                averageKills /= numberOfMatches;
+                averageDeaths /= numberOfMatches;
+                averageAssists /= numberOfMatches;
+                topHeroesWithComputedFields.add(new TopHeroComputedDTO(localized_name, averageKills, averageDeaths, averageAssists, numberOfMatches, roles));
+                isMatched = false;
+            }
         });
 
         String recentMatchAggregateJson;
@@ -206,7 +214,7 @@ public class OpenDotaRestServiceImpl implements OpenDotaRestService {
         try{
             recentMatchAggregateJson = this.objectMapper.writeValueAsString(temp);
             topHeroesDataJson = this.objectMapper.writeValueAsString(topHeroesWithComputedFields);
-
+            System.out.println(topHeroesDataJson);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
