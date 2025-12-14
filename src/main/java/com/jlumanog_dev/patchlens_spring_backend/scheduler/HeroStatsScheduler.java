@@ -95,34 +95,6 @@ public class HeroStatsScheduler {
         return topHeroes;
     }
 
-    public Map<String, Object> heroesPlayedByUser(BigInteger user){
-        //there might be race condition issue here. fix later if possible
-        //need to get the cache for all hero details from allHeroesStatsCache to get the img and localized_name
-        CaffeineCache allHeroes = (CaffeineCache) this.cacheManager.getCache("allHeroesStatsCache");
-        Map<String, Object> heroesPlayedList = this.openDotaRestService.retrieveHeroesPlayed(user);
-        assert allHeroes != null;
-        Cache<Object, Object> allHeroesNativeCache = allHeroes.getNativeCache();
-
-        /* Since I'm not using Entity relationships and JPA advance mapping:
-        Need to retrieve the allHeroes cache and filter out which item matches heroes' ID from
-        heroesPlayedList so that I can assign the correct localized_name & img, and probably a few more*/
-        for (MatchRankedDTO element : (List<MatchRankedDTO>) heroesPlayedList.get("recentMatches")){
-            /*Reminder that the 'value' is a list of type HeroesPlayedByUserDTO itself, check the sout output and see.
-            The allHeroesNativeCache  is converted to a Map collection that contains only 1 value (allHeroesStatsCache)
-            to use the forEach method and access the actual value needed through 'value' object parameter.*/
-            allHeroesNativeCache.asMap().forEach((key, value) -> {
-                //The value should be a list of type HeroDataDTO.
-                Optional<HeroDataDTO> heroItem = ((List<HeroDataDTO>) value).stream().filter(hero ->
-                        hero.getId() == element.getHero_id()).findFirst();
-                assert heroItem.isPresent();
-                element.setImg(heroItem.get().getImg());
-                element.setRoles(heroItem.get().getRoles());
-                element.setLocalized_name(heroItem.get().getLocalized_name());
-            });
-        }
-        return heroesPlayedList;
-    }
-
     public double averageMethod(int[] pubWinTrend){
         int sum = 0;
         for (int j : pubWinTrend) {

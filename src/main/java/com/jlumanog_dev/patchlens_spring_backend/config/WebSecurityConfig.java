@@ -1,5 +1,6 @@
 package com.jlumanog_dev.patchlens_spring_backend.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jlumanog_dev.patchlens_spring_backend.custom_auth.CustomPinAuthProvider;
 import com.jlumanog_dev.patchlens_spring_backend.custom_auth.JwtAuthenticationFilter;
 import com.jlumanog_dev.patchlens_spring_backend.services.UserService;
@@ -92,6 +93,11 @@ public class WebSecurityConfig {
     @Bean
     public ModelMapper modelMapper(){
         return new ModelMapper();
+    }
+
+    @Bean
+    public ObjectMapper objectMapper(){
+        return new ObjectMapper();
     }
 
 }

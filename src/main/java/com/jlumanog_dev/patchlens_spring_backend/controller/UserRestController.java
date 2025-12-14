@@ -4,6 +4,7 @@ import com.anthropic.client.AnthropicClient;
 import com.anthropic.models.messages.Message;
 import com.anthropic.models.messages.MessageCreateParams;
 import com.anthropic.models.messages.Model;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.jlumanog_dev.patchlens_spring_backend.custom_auth.JwtService;
 import com.jlumanog_dev.patchlens_spring_backend.custom_auth.PinAuthenticationToken;
 import com.jlumanog_dev.patchlens_spring_backend.custom_auth.SHAUtility;
@@ -35,14 +36,12 @@ import java.util.Map;
 @RequestMapping("/api")
 public class UserRestController {
     private UserService userService;
-    private BCryptPasswordEncoder passwordEncoder;
     private DelegatingPasswordEncoder delegatingPasswordEncoder;
     private ModelMapper modelMapper;
     private HeroStatsScheduler heroStatsScheduler;
     private OpenDotaRestService openDotaRestService;
     private AuthenticationManager authenticationManager;
     private JwtService jwtService;
-    private AnthropicClient anthropicClient;
     private CacheManager cacheManager;
     private RestTemplate dotaRestTemplate;
 
@@ -55,7 +54,6 @@ public class UserRestController {
                                HeroStatsScheduler heroStatsScheduler,
                                AuthenticationManager authenticationManager,
                                JwtService jwtService,
-                               AnthropicClient anthropicClient,
                                CacheManager cacheManager,
                                RestTemplate dotaRestTemplate){
         this.userService = userService;
@@ -65,7 +63,6 @@ public class UserRestController {
         this.openDotaRestService = openDotaRestService;
         this.authenticationManager = authenticationManager;
         this.jwtService = jwtService;
-        this.anthropicClient = anthropicClient;
         this.cacheManager = cacheManager;
         this.dotaRestTemplate = dotaRestTemplate;
     }
@@ -139,7 +136,7 @@ public class UserRestController {
     public ResponseEntity<Map<String, Object>> retrieveHeroesPlayedByUser(){
         Authentication authUser = SecurityContextHolder.getContext().getAuthentication();
         UserDTO user = this.modelMapper.map(authUser.getPrincipal(), UserDTO.class);
-        Map<String, Object>playedByUserDTO = this.heroStatsScheduler.heroesPlayedByUser(user.getPlayerIdField());
+        Map<String, Object>playedByUserDTO = this.openDotaRestService.heroesPlayedByUser(user.getPlayerIdField());
 
         return ResponseEntity.ok(playedByUserDTO);
     }
@@ -147,10 +144,6 @@ public class UserRestController {
     @GetMapping("/user/recentMatches")
     public ResponseEntity<Map<String, Object>> retrieveRecentMatches(){
         Authentication authUser = SecurityContextHolder.getContext().getAuthentication();
-        //MessageCreateParams params = MessageCreateParams.builder().maxTokens(1024L).addUserMessage("Hi Claude").model(Model.CLAUDE_SONNET_4_5_20250929).build();
-       //Message message = this.anthropicClient.messages().create(params);
-        //System.out.println(message);
-
         //might add try catch here or some kind of exception handling
         UserDTO user = this.modelMapper.map(authUser.getPrincipal(), UserDTO.class); // seems unnecessary, just making sure I'm using user object with no password field - might change later
         CaffeineCache recentMatchesResultCache = (CaffeineCache) this.cacheManager.getCache("recentMatchesResultCache");
@@ -162,7 +155,6 @@ public class UserRestController {
             recentMatchMap = this.openDotaRestService.fetchRecentMatchWithCache(user.getPlayerIdField());
             return ResponseEntity.ok(this.openDotaRestService.retrieveRecentMatches(user.getPlayerIdField(), recentMatchMap));
         }
-        System.out.println("returning cached data (unchanged)");
         RecentMatchesDTO[] recentMatchesArray = this.dotaRestTemplate.getForObject("https://api.opendota.com/api/players/" + user.getPlayerIdField() + "/recentMatches?game_mode=22", RecentMatchesDTO[].class);
         //Map<String, Object> recentMatchesMap = (Map<String, Object>) recentMatchesResultCache.getNativeCache().asMap().entrySet().iterator().next().getValue();
         assert recentMatchesArray != null;
@@ -171,7 +163,6 @@ public class UserRestController {
             RecentMatchesDTO[] matches = (RecentMatchesDTO[]) value;
             int iterate = 0;
             for (RecentMatchesDTO element : matches){
-                System.out.println(element);
                 if(element.getMatch_id() != recentMatchesArray[iterate].getMatch_id()){
                     recentMatchCache.evict(key);
                     recentMatchesResultCache.evict(key);
