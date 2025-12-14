@@ -96,9 +96,10 @@ public class OpenDotaRestServiceImpl implements OpenDotaRestService {
         HeroDataDTO hero = allHeroesList.stream().filter(element -> element.getId() == heroId).findFirst().get();
         try{
             String heroJson = this.objectMapper.writeValueAsString(hero);
+            System.out.println(heroJson);
             MessageCreateParams params = MessageCreateParams.
                     builder().maxTokens(2000).system(systemPrompt).
-                    addUserMessage("A hero's Pub Performance: " + heroJson).model(Model.CLAUDE_SONNET_4_5_20250929).build();
+                    addUserMessage("A hero's Pub Performance. Make sure to take note on the Pro-to-Pub disparity score and trendStdDev (standard deviation score of a hero): " + heroJson).model(Model.CLAUDE_SONNET_4_5_20250929).build();
             Message message = this.anthropicClient.messages().create(params);
             hero.setInsight(message.content());
         } catch (JsonProcessingException e) {
