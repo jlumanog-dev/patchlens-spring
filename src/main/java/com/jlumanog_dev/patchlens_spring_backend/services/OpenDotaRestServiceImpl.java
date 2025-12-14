@@ -97,7 +97,7 @@ public class OpenDotaRestServiceImpl implements OpenDotaRestService {
         List<HeroDataDTO> allHeroesList = (List<HeroDataDTO>) allHeroesCache.getNativeCache().asMap().entrySet().iterator().next().getValue();
         return allHeroesList.stream().filter(element -> element.getId() == heroId).findFirst().get();
     }
-    @Cacheable(value="recentMatchDataCache")
+    @Cacheable(value="recentMatchDataCache", key = "#steamId")
     public RecentMatchesDTO[] fetchRecentMatchWithCache(BigInteger steamId){
         RecentMatchesDTO[] recentMatchesDTOList = this.dotaRestTemplate.getForObject(this.api[1] + steamId.toString() + this.apiQueryParams[0], RecentMatchesDTO[].class);
         System.out.println("new cache");
@@ -105,7 +105,7 @@ public class OpenDotaRestServiceImpl implements OpenDotaRestService {
     }
 
     @Override
-    @Cacheable(value="recentMatchesResultCache")
+    @Cacheable(value="recentMatchesResultCache", key = "#steamId")
     public Map<String, Object> retrieveRecentMatches(BigInteger steamId, RecentMatchesDTO[] recentMatchMap){
         CaffeineCache allHeroesCache = (CaffeineCache) this.cacheManager.getCache("allHeroesStatsCache");
         assert allHeroesCache != null;
