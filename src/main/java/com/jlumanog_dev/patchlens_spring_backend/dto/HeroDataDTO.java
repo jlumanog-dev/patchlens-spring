@@ -1,5 +1,8 @@
 package com.jlumanog_dev.patchlens_spring_backend.dto;
+import com.anthropic.models.messages.ContentBlock;
+
 import java.math.BigDecimal;
+import java.util.List;
 
 public class HeroDataDTO {
     private int id;
@@ -27,6 +30,16 @@ public class HeroDataDTO {
     private float disparityScore;
     private String img;
     private String icon;
+
+    private List<ContentBlock> insight;
+
+    public List<ContentBlock> getInsight() {
+        return insight;
+    }
+
+    public void setInsight(List<ContentBlock> insight) {
+        this.insight = insight;
+    }
 
     public int getBase_str() {
         return base_str;

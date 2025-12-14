@@ -28,6 +28,9 @@ public class OpenDotaRestServiceImpl implements OpenDotaRestService {
     private RestTemplate dotaRestTemplate;
     private CacheManager cacheManager;
     private ObjectMapper objectMapper;
+
+    String systemPrompt = "You are a professional Dota 2 Player and Coach that understands the importance of a player's stats to assess gameplay performance, but also the stats of each hero only if provided, like how they perform on pubs to determine which heroes are trending, and whether you recommend playing these heroes or not based on the data provided to you over time. Your answers should be very short because players may be impatient to read long text or response, but straight to the point and you're able to convey an overall assessment, insights, and recommendations in a way that is intuitive for casual players and maybe encouraging, just like how a Coach wants players to improve and get better at the game. Do not use any outline or list in your response.";
+
     //these API endpoints don't need keys at the moment
     private String[] api = {
             "https://api.opendota.com/api/heroStats",
@@ -84,18 +87,24 @@ public class OpenDotaRestServiceImpl implements OpenDotaRestService {
     }
 
     @Override
+    @Cacheable(value = "pubHeroDataCache")
     public HeroDataDTO retrieveHero(int heroId){
         CaffeineCache allHeroesCache = (CaffeineCache) this.cacheManager.getCache("allHeroesStatsCache");
         assert allHeroesCache != null;
 
-/*        allHeroesCache.getNativeCache().asMap().forEach((key, value) ->{
-            Optional<HeroDataDTO> temp = ((List<HeroDataDTO>) value)
-                    .stream().filter(hero -> hero.getId() == heroId).findFirst();
-            assert temp.isPresent();
-            heroRetrievedDTO = temp;
-        });*/
         List<HeroDataDTO> allHeroesList = (List<HeroDataDTO>) allHeroesCache.getNativeCache().asMap().entrySet().iterator().next().getValue();
-        return allHeroesList.stream().filter(element -> element.getId() == heroId).findFirst().get();
+        HeroDataDTO hero = allHeroesList.stream().filter(element -> element.getId() == heroId).findFirst().get();
+        try{
+            String heroJson = this.objectMapper.writeValueAsString(hero);
+            MessageCreateParams params = MessageCreateParams.
+                    builder().maxTokens(2000).system(systemPrompt).
+                    addUserMessage("A hero's Pub Performance: " + heroJson).model(Model.CLAUDE_SONNET_4_5_20250929).build();
+            Message message = this.anthropicClient.messages().create(params);
+            hero.setInsight(message.content());
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+        return hero;
     }
     @Cacheable(value="recentMatchDataCache", key = "#steamId")
     public RecentMatchesDTO[] fetchRecentMatchWithCache(BigInteger steamId){
@@ -218,11 +227,9 @@ public class OpenDotaRestServiceImpl implements OpenDotaRestService {
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
-        String systemPrompt = "You are a professional Dota 2 Player and Coach that understands the importance of a player's stats to assess gameplay performance, but also the stats of each hero only if provided, like how they perform on pubs to determine which heroes are trending, and whether you recommend playing these heroes or not based on the data provided to you over time. Your answers should be very short because players may be impatient to read long text or response, but straight to the point and you're able to convey an overall assessment, insights, and recommendations in a way that is intuitive for casual players and maybe encouraging, just like how a Coach wants players to improve and get better at the game. Do not use any outline or list in your response.";
-
 
         MessageCreateParams params = MessageCreateParams.
-                builder().maxTokens(2000).system(systemPrompt).
+                builder().maxTokens(2000).system(this.systemPrompt).
                 addUserMessage("Player's computed data based on recent matches:" + recentMatchAggregateJson + "Top 3 most played heroes in recent match: " + topHeroesDataJson).
                 model(Model.CLAUDE_SONNET_4_5_20250929).build();
         Message message = this.anthropicClient.messages().create(params);
