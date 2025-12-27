@@ -1,16 +1,10 @@
 package com.jlumanog_dev.patchlens_spring_backend.controller;
 
-import com.anthropic.client.AnthropicClient;
-import com.anthropic.models.messages.Message;
-import com.anthropic.models.messages.MessageCreateParams;
-import com.anthropic.models.messages.Model;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.jlumanog_dev.patchlens_spring_backend.custom_auth.JwtService;
 import com.jlumanog_dev.patchlens_spring_backend.custom_auth.PinAuthenticationToken;
 import com.jlumanog_dev.patchlens_spring_backend.custom_auth.SHAUtility;
 import com.jlumanog_dev.patchlens_spring_backend.dto.*;
 import com.jlumanog_dev.patchlens_spring_backend.entity.User;
-import com.jlumanog_dev.patchlens_spring_backend.entity.UserInsight;
 import com.jlumanog_dev.patchlens_spring_backend.exception.AuthenticationErrorException;
 import com.jlumanog_dev.patchlens_spring_backend.scheduler.HeroStatsScheduler;
 import com.jlumanog_dev.patchlens_spring_backend.services.OpenDotaRestService;
@@ -28,7 +22,6 @@ import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
-import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -86,11 +79,9 @@ public class UserRestController {
 
         Object encodedPin = this.delegatingPasswordEncoder.encode(payloadUser.getPinField());
         String finalEncodedValue =  encodedPin.toString();
-        UserInsight tempInsight = new UserInsight("no player insight at the moment");
         payloadUser.setPinField(finalEncodedValue);
         payloadUser.setShaLookup(shaEncoded);
         payloadUser.setRole("USER");
-        payloadUser.setUser_insight(tempInsight);
         this.userService.save(payloadUser);
         Map<String, Object> response = new HashMap<>();
 
