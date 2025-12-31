@@ -3,6 +3,7 @@ package com.jlumanog_dev.patchlens_spring_backend.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jlumanog_dev.patchlens_spring_backend.custom_auth.CustomPinAuthProvider;
 import com.jlumanog_dev.patchlens_spring_backend.custom_auth.JwtAuthenticationFilter;
+import com.jlumanog_dev.patchlens_spring_backend.custom_auth.JwtService;
 import com.jlumanog_dev.patchlens_spring_backend.services.UserService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
